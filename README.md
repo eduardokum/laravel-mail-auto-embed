@@ -1,0 +1,1 @@
+# laravel-mail-auto-embed
