@@ -16,7 +16,7 @@ You must install this service provider.
 ```php
 $providers = [
     ...
-    \LaravelMailAutoEmbed\Providers\LaravelMailAutoEmbedServiceProvider::class,
+    \Eduardokum\LaravelMailAutoEmbed\Providers\LaravelMailAutoEmbedServiceProvider::class,
     ...
  ];
 ```
