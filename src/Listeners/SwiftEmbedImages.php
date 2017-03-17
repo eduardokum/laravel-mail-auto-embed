@@ -1,5 +1,5 @@
 <?php
-namespace LaravelMailAutoEmbed\Listeners;
+namespace Eduardokum\LaravelMailAutoEmbed\Listeners;
 
 use Swift_Events_SendEvent;
 use Swift_Events_SendListener;

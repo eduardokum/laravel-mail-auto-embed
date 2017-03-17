@@ -1,5 +1,5 @@
 <?php
-namespace LaravelMailAutoEmbed\Providers;
+namespace Eduardokum\LaravelMailAutoEmbed\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use LaravelMailAutoEmbed\Listeners\SwiftEmbedImages;
