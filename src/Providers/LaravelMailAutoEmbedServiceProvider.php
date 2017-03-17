@@ -2,7 +2,7 @@
 namespace Eduardokum\LaravelMailAutoEmbed\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use LaravelMailAutoEmbed\Listeners\SwiftEmbedImages;
+use Eduardokum\LaravelMailAutoEmbed\Listeners\SwiftEmbedImages;
 use Mail;
 
 class MailAutoEmbedServiceProvider extends ServiceProvider
