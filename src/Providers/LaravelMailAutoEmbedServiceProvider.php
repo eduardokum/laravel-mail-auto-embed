@@ -5,7 +5,7 @@ use Illuminate\Support\ServiceProvider;
 use Eduardokum\LaravelMailAutoEmbed\Listeners\SwiftEmbedImages;
 use Mail;
 
-class MailAutoEmbedServiceProvider extends ServiceProvider
+class LaravelMailAutoEmbedServiceProvider extends ServiceProvider
 {
     /**
      * Bootstrap the application services.
