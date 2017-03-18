@@ -48,7 +48,7 @@ When sending, it will replace the link that would normally generated `<img src="
 
 Also works for raw html too:
 
-```
+```html
 // eg: resources/vendor/mail/html/header.blade.php
 <tr>
     <td class="header">
