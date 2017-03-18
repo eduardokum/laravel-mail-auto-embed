@@ -21,6 +21,51 @@ $providers = [
  ];
 ```
 
+## Usage
+
+Its use is very simple, you write your markdown normally:
+
+```
+@component('mail::message')
+# Order Shipped
+
+Your order has been shipped!
+
+@component('mail::button', ['url' => $url])
+View Order
+@endcomponent
+
+Purchased product:
+
+![product](https://domain.com/products/product-1.png)
+
+Thanks,<br>
+{{ config('app.name') }}
+@endcomponent
+```
+
+When sending, it will replace the link that would normally generated `<img src="https://domain.com/products/product-1.png">` by the embed of the image eg `<img src = "cid:3991f143cf1a86257f8671883736613c@Swift.generated">` and attach the file in the email.
+
+Also works for raw html too:
+
+```
+// eg: resources/vendor/mail/html/header.blade.php
+<tr>
+    <td class="header">
+        <a href="{{ $url }}">
+            <img src="https://domain.com/logo.png" class="img-header">
+        </a>
+    </td>
+</tr>
+```
+
+If you do not want to embed the image to use some kind of image tracker, simply add the attribute `data-skip-embed` in image tag.
+
+```html
+<img src="https://domain.com/logo.png" data-skip-embed class="img-header">
+```
+
+
 ## How it's works
 
 It traverses the html rendered and replaces all the images that have a url by the same embedded in the body of the email.
