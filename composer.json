@@ -30,5 +30,12 @@
         "psr-4": {
             "Eduardokum\\LaravelMailAutoEmbed\\Tests\\": "tests"
         }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Eduardokum\\LaravelMailAutoEmbed\\Providers\\LaravelMailAutoEmbedServiceProvider"
+            ]
+        }
     }
 }
