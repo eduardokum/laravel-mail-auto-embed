@@ -15,9 +15,9 @@
     ],
     "require": {
         "php" : ">=5.5.0",
-        "illuminate/contracts": "^5.3.0",
-        "illuminate/support": "5.3.0",
-        "illuminate/mail": "^5.3.0"
+        "illuminate/contracts": ">=5.3",
+        "illuminate/support": ">=5.3",
+        "illuminate/mail": ">=5.3"
     },
     "require-dev": {
     },
