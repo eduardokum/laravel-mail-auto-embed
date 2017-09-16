@@ -51,7 +51,13 @@ class SwiftEmbedImages implements Swift_Events_SendListener
      */
     private function replaceCallback($match)
     {
-        if (filter_var($match[1], FILTER_VALIDATE_URL) === false || strpos($match[0], 'data-skip-embed') !== false) {
+        // Don't embed if 'data-skip-embed' is present
+        if (strpos($match[0], 'data-skip-embed') !== false) {
+            return $match[0];
+        }
+
+        // Don't embed if src is not an URL
+        if (filter_var($match[1], FILTER_VALIDATE_URL) === false) {
             return $match[0];
         }
 
