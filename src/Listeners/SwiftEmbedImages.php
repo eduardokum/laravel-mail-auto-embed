@@ -10,9 +10,22 @@ use Swift_Message;
 class SwiftEmbedImages implements Swift_Events_SendListener
 {
     /**
+     * @var  array
+     */
+    private $config;
+
+    /**
      * @var  Swift_Message
      */
     private $message;
+
+    /**
+     * @param  array  $config
+     */
+    public function __construct($config)
+    {
+        $this->config = $config;
+    }
 
     /**
      * @param  Swift_Events_SendEvent  $evt
@@ -53,6 +66,11 @@ class SwiftEmbedImages implements Swift_Events_SendListener
     {
         // Don't embed if 'data-skip-embed' is present
         if (strpos($match[0], 'data-skip-embed') !== false) {
+            return $match[0];
+        }
+
+        // Don't embed if auto-embed is disabled and 'data-auto-embed' is absent
+        if (!$this->config['enabled'] && strpos($match[0], 'data-auto-embed') === false) {
             return $match[0];
         }
 

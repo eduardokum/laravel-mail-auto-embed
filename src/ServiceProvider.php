@@ -15,7 +15,9 @@ class ServiceProvider extends BaseServiceProvider
      */
     public function boot()
     {
-        Mail::getSwiftMailer()->registerPlugin(new SwiftEmbedImages());
+        $this->publishes([$this->getConfigPath() => config_path('mail-auto-embed.php')], 'config');
+
+        Mail::getSwiftMailer()->registerPlugin(new SwiftEmbedImages($this->app['config']->get('mail-auto-embed')));
     }
 
     /**
@@ -25,5 +27,14 @@ class ServiceProvider extends BaseServiceProvider
      */
     public function register()
     {
+        $this->mergeConfigFrom($this->getConfigPath(), 'mail-auto-embed');
+    }
+
+    /**
+     * @return string
+     */
+    protected function getConfigPath()
+    {
+        return __DIR__.'/../config/mail-auto-embed.php';
     }
 }

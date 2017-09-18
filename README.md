@@ -73,3 +73,27 @@ simply add the attribute `data-skip-embed` in the image tag:
 ```html
 <img src="https://domain.com/logo.png" data-skip-embed class="img-header">
 ```
+
+
+## Explicit embedding configuration
+
+By default, images are embedded automatically, unless you add the `data-skip-embed` attribute.
+
+You can also disable auto-embedding globally by setting the `MAIL_AUTO_EMBED` environment variable to `false`.
+You can then enable embedding for specific images with the `data-auto-embed` attribute.
+
+```
+# .env
+MAIL_AUTO_EMBED=false
+```
+
+```html
+<p>
+    <!-- Won't be embedded -->
+    <img src="https://domain.com/logo.png" class="img-header">
+</p>
+<p>
+    <!-- Explicit embedding -->
+    <img src="https://domain.com/item.png"  data-auto-embed>
+</p>
+```
