@@ -1,12 +1,12 @@
 <?php
 
-namespace Eduardokum\LaravelMailAutoEmbed\Providers;
+namespace Eduardokum\LaravelMailAutoEmbed;
 
 use Eduardokum\LaravelMailAutoEmbed\Listeners\SwiftEmbedImages;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\ServiceProvider as BaseServiceProvider;
 
-class LaravelMailAutoEmbedServiceProvider extends ServiceProvider
+class ServiceProvider extends BaseServiceProvider
 {
     /**
      * Bootstrap the application services.

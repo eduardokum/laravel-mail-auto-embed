@@ -19,7 +19,7 @@ For previous versions of Laravel, you need to add the following Service Provider
 ```php
 $providers = [
     ...
-    \Eduardokum\LaravelMailAutoEmbed\Providers\LaravelMailAutoEmbedServiceProvider::class,
+    \Eduardokum\LaravelMailAutoEmbed\ServiceProvider::class,
     ...
  ];
 ```

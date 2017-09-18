@@ -34,7 +34,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Eduardokum\\LaravelMailAutoEmbed\\Providers\\LaravelMailAutoEmbedServiceProvider"
+                "Eduardokum\\LaravelMailAutoEmbed\\ServiceProvider"
             ]
         }
     }
