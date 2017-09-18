@@ -1,9 +1,10 @@
 <?php
+
 namespace Eduardokum\LaravelMailAutoEmbed\Providers;
 
-use Illuminate\Support\ServiceProvider;
 use Eduardokum\LaravelMailAutoEmbed\Listeners\SwiftEmbedImages;
-use Mail;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\ServiceProvider;
 
 class LaravelMailAutoEmbedServiceProvider extends ServiceProvider
 {
@@ -14,7 +15,7 @@ class LaravelMailAutoEmbedServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-         Mail::getSwiftMailer()->registerPlugin(new SwiftEmbedImages());
+        Mail::getSwiftMailer()->registerPlugin(new SwiftEmbedImages());
     }
 
     /**
