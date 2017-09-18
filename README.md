@@ -97,3 +97,61 @@ MAIL_AUTO_EMBED=false
     <img src="https://domain.com/item.png"  data-auto-embed>
 </p>
 ```
+
+
+## Embedding entities
+
+You might want to embed images that don't actually exist in your filesystem (stored in the database).
+
+In that case, make the entities you want to embed implement the `EmbeddableEntity` interface:
+
+```php
+namespace App\Models;
+
+use Eduardokum\LaravelMailAutoEmbed\Models\EmbeddableEntity;
+use Illuminate\Database\Eloquent\Model;
+
+class Picture extends Model implements EmbeddableEntity
+{
+    /**
+     * @param  mixed  $id
+     * @return Picture
+     */
+    public static function findEmbeddable($id)
+    {
+        return static::find($id);
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getRawContent()
+    {
+        return $this->data;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFileName()
+    {
+        return 'profile_'.$this->id.'.png';
+    }
+
+    /**
+     * @return string
+     */
+    public function getMimeType()
+    {
+        return 'image/png';
+    }
+}
+```
+
+Then, you can use the `embed:ClassName:id` syntax in your e-mail template:
+
+```html
+<p>
+    <img src="embed:App\Models\Picture:123">
+</p>
+```
