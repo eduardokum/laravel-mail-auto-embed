@@ -5,13 +5,16 @@
 
 # Laravel Mail Auto Embed
 
+
 ## Install
+
 You can install the package via composer:
 ```bash
 $ composer require eduardokum/laravel-mail-auto-embed
 ```
 
-You must install this service provider.
+This package uses Laravel 5.5 Package Auto-Discovery.<br>
+For previous versions of Laravel, you need to add the following Service Provider:
 
 ```php
 $providers = [
@@ -20,6 +23,7 @@ $providers = [
     ...
  ];
 ```
+
 
 ## Usage
 
@@ -44,9 +48,13 @@ Thanks,<br>
 @endcomponent
 ```
 
-When sending, it will replace the link that would normally generated `<img src="https://domain.com/products/product-1.png">` by the embed of the image eg `<img src = "cid:3991f143cf1a86257f8671883736613c@Swift.generated">` and attach the file in the email.
+When sending, it will replace the link that would normally be generated:
+> `<img src="https://domain.com/products/product-1.png">` 
 
-Also works for raw html too:
+by an embedded inline attachment of the image:
+> `<img src="cid:3991f143cf1a86257f8671883736613c@Swift.generated">`.
+
+It also works for raw html too:
 
 ```html
 // eg: resources/vendor/mail/html/header.blade.php
@@ -59,14 +67,9 @@ Also works for raw html too:
 </tr>
 ```
 
-If you do not want to embed the image to use some kind of image tracker, simply add the attribute `data-skip-embed` in image tag.
+If you do not want to use automatic embedding for specific images (because they are hosted elsewhere, if you want to use some kind of image tracker, etc.) 
+simply add the attribute `data-skip-embed` in the image tag:
 
 ```html
 <img src="https://domain.com/logo.png" data-skip-embed class="img-header">
 ```
-
-
-## How it's works
-
-It traverses the html rendered and replaces all the images that have a url by the same embedded in the body of the email.
-To skip the replace, add the tag in the image `data-skip-embed`
