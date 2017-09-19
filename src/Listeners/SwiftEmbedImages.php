@@ -72,9 +72,13 @@ class SwiftEmbedImages implements Swift_Events_SendListener
         $src        = $match[1];
         $attributes = $match[2];
 
-        return $this->needsEmbed($imageTag)
-            ? '<img src="'.$this->embed($src).'" '.$attributes.'/>'
-            : $imageTag;
+        if (!$this->needsEmbed($imageTag)) {
+            return $imageTag;
+        }
+
+        $embedder = $this->getEmbedder($imageTag);
+
+        return '<img src="'.$this->embed($embedder, $src).'" '.$attributes.'/>';
     }
 
     /**
@@ -97,28 +101,32 @@ class SwiftEmbedImages implements Swift_Events_SendListener
     }
 
     /**
+     * @param  string  $imageTag
      * @return Embedder
      */
-    private function getEmbedder()
+    private function getEmbedder($imageTag)
     {
-        switch ($this->config['method']) {
+        $method = preg_match('/data-auto-embed=[\'"]?([^\'"]*)[\'"]?/', $imageTag, $matches)
+            ? $matches[1]
+            : $this->config['method'];
+
+        switch ($method) {
 
             case 'attachment':
+            default:
                 return new AttachmentEmbedder($this->message);
 
             case 'base64':
                 return new Base64Embedder();
-
-            default:
-                throw new \InvalidArgumentException(sprintf('Invalid embed method %s', $this->config['method']));
         }
     }
 
     /**
-     * @param  string  $src
+     * @param  Embedder  $embedder
+     * @param  string    $src
      * @return string
      */
-    private function embed($src)
+    private function embed(Embedder $embedder, $src)
     {
         // Entity embedding
         if (strpos($src, 'embed:') === 0) {
@@ -145,12 +153,12 @@ class SwiftEmbedImages implements Swift_Events_SendListener
                 return $src;
             }
 
-            return $this->getEmbedder()->fromEntity($instance);
+            return $embedder->fromEntity($instance);
         }
 
         // URL embedding
         if (filter_var($src, FILTER_VALIDATE_URL) !== false) {
-            return $this->getEmbedder()->fromUrl($src);
+            return $embedder->fromUrl($src);
         }
 
         return $src;

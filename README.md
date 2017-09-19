@@ -160,4 +160,19 @@ Then, you can use the `embed:ClassName:id` syntax in your e-mail template:
 ## Base64 embedding
 
 If you prefer to use Base64 instead of inline attachments, you can do so by setting the `MAIL_AUTO_EMBED_METHOD` environment variable to `base64`. 
+
 Note that it will increase the e-mail size, and that it won't be decoded by some e-mail clients such as Gmail.
+
+
+## Mixed embedding methods
+
+If you want to use both inline attachment and Base64 depending on the image, you can specify the embedding method as the `data-auto-embed` attribute value:   
+
+```html
+<p>
+    <img src="https://domain.com/logo.png" data-auto-embed="base64">
+</p>
+<p>
+    <img src="https://domain.com/item.png" data-auto-embed="attachment">
+</p>
+```
