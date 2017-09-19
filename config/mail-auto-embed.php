@@ -14,4 +14,15 @@ return [
 
     'enabled' => env('MAIL_AUTO_EMBED', true),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Mail embed method
+    |--------------------------------------------------------------------------
+    |
+    | Supported: "attachment", "base64"
+    |
+    */
+
+    'method' => env('MAIL_AUTO_EMBED_METHOD', 'attachment'),
+
 ];

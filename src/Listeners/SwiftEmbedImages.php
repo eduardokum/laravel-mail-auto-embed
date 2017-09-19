@@ -2,12 +2,13 @@
 
 namespace Eduardokum\LaravelMailAutoEmbed\Listeners;
 
+use Eduardokum\LaravelMailAutoEmbed\Embedder\AttachmentEmbedder;
+use Eduardokum\LaravelMailAutoEmbed\Embedder\Base64Embedder;
+use Eduardokum\LaravelMailAutoEmbed\Embedder\Embedder;
 use Eduardokum\LaravelMailAutoEmbed\Models\EmbeddableEntity;
 use ReflectionClass;
-use Swift_EmbeddedFile;
 use Swift_Events_SendEvent;
 use Swift_Events_SendListener;
-use Swift_Image;
 use Swift_Message;
 
 class SwiftEmbedImages implements Swift_Events_SendListener
@@ -67,81 +68,91 @@ class SwiftEmbedImages implements Swift_Events_SendListener
      */
     private function replaceCallback($match)
     {
+        $imageTag   = $match[0];
+        $src        = $match[1];
+        $attributes = $match[2];
+
+        return $this->needsEmbed($imageTag)
+            ? '<img src="'.$this->embed($src).'" '.$attributes.'/>'
+            : $imageTag;
+    }
+
+    /**
+     * @param  string  $imageTag
+     * @return bool
+     */
+    private function needsEmbed($imageTag)
+    {
         // Don't embed if 'data-skip-embed' is present
-        if (strpos($match[0], 'data-skip-embed') !== false) {
-            return $match[0];
+        if (strpos($imageTag, 'data-skip-embed') !== false) {
+            return false;
         }
 
         // Don't embed if auto-embed is disabled and 'data-auto-embed' is absent
-        if (!$this->config['enabled'] && strpos($match[0], 'data-auto-embed') === false) {
-            return $match[0];
+        if (!$this->config['enabled'] && strpos($imageTag, 'data-auto-embed') === false) {
+            return false;
         }
 
+        return true;
+    }
+
+    /**
+     * @return Embedder
+     */
+    private function getEmbedder()
+    {
+        switch ($this->config['method']) {
+
+            case 'attachment':
+                return new AttachmentEmbedder($this->message);
+
+            case 'base64':
+                return new Base64Embedder();
+
+            default:
+                throw new \InvalidArgumentException(sprintf('Invalid embed method %s', $this->config['method']));
+        }
+    }
+
+    /**
+     * @param  string  $src
+     * @return string
+     */
+    private function embed($src)
+    {
         // Entity embedding
-        if (strpos($match[1], 'embed:') === 0) {
-            return $this->embedEntity($match);
+        if (strpos($src, 'embed:') === 0) {
+
+            $embedParams = explode(':', $src);
+            if (count($embedParams) < 3) {
+                return $src;
+            }
+
+            $className = urldecode($embedParams[1]);
+            $id = $embedParams[2];
+
+            if (!class_exists($className)) {
+                return $src;
+            }
+
+            $class = new ReflectionClass($className);
+            if (! $class->implementsInterface(EmbeddableEntity::class) ) {
+                return $src;
+            }
+
+            /** @var EmbeddableEntity $className */
+            if (! $instance = $className::findEmbeddable($id)) {
+                return $src;
+            }
+
+            return $this->getEmbedder()->fromEntity($instance);
         }
 
         // URL embedding
-        if (filter_var($match[1], FILTER_VALIDATE_URL) !== false) {
-            return $this->embedUrlMatch($match);
+        if (filter_var($src, FILTER_VALIDATE_URL) !== false) {
+            return $this->getEmbedder()->fromUrl($src);
         }
 
-        return $match[0];
-    }
-
-    /**
-     * @param  array  $match
-     * @return string
-     */
-    private function embedUrlMatch($match)
-    {
-        return '<img src="'.$this->message->embed(Swift_Image::fromPath($this->replaceUtlToAbsolute($match[1]))).'" '.$match[2].'/>';
-    }
-
-    /**
-     * @param  array  $match
-     * @return string
-     */
-    private function embedEntity($match)
-    {
-        $embedParams = explode(':', $match[1]);
-        if (count($embedParams) < 3) {
-            return $match[0];
-        }
-
-        $className = urldecode($embedParams[1]);
-        $id = $embedParams[2];
-
-        if (!class_exists($className)) {
-            return $match[0];
-        }
-
-        $class = new ReflectionClass($className);
-        if (! $class->implementsInterface(EmbeddableEntity::class) ) {
-            return $match[0];
-        }
-
-        /** @var EmbeddableEntity $className */
-        if (! $instance = $className::findEmbeddable($id)) {
-            return $match[0];
-        }
-
-        $embedded = new Swift_EmbeddedFile(
-            $instance->getRawContent(),
-            $instance->getFileName(),
-            $instance->getMimeType()
-        );
-
-        return '<img src="'.$this->message->embed($embedded).'" '.$match[2].'/>';
-    }
-
-    /**
-     * @param  string  $file
-     * @return mixed
-     */
-    private function replaceUtlToAbsolute($file)
-    {
-        return str_replace(url('/'), public_path('/'), $file);
+        return $src;
     }
 }

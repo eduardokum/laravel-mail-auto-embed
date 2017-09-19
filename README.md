@@ -155,3 +155,9 @@ Then, you can use the `embed:ClassName:id` syntax in your e-mail template:
     <img src="embed:App\Models\Picture:123">
 </p>
 ```
+
+
+## Base64 embedding
+
+If you prefer to use Base64 instead of inline attachments, you can do so by setting the `MAIL_AUTO_EMBED_METHOD` environment variable to `base64`. 
+Note that it will increase the e-mail size, and that it won't be decoded by some e-mail clients such as Gmail.
