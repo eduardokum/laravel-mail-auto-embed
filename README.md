@@ -75,7 +75,15 @@ simply add the attribute `data-skip-embed` in the image tag:
 ```
 
 
-## Explicit embedding configuration
+## Configuration
+
+The defaults are set in `config/mail-auto-embed.php`. You can copy this file to your own config directory to modify the values using this command:
+
+```shell
+php artisan vendor:publish --provider="Eduardokum\LaravelMailAutoEmbed\ServiceProvider"
+```
+
+### Explicit embedding configuration
 
 By default, images are embedded automatically, unless you add the `data-skip-embed` attribute.
 
@@ -95,6 +103,26 @@ MAIL_AUTO_EMBED=false
 <p>
     <!-- Explicit embedding -->
     <img src="https://domain.com/item.png"  data-auto-embed>
+</p>
+```
+
+### Base64 embedding
+
+If you prefer to use Base64 instead of inline attachments, you can do so by setting the `MAIL_AUTO_EMBED_METHOD` environment variable to `base64`. 
+
+Note that it will increase the e-mail size, and that it won't be decoded by some e-mail clients such as Gmail.
+
+
+## Mixed embedding methods
+
+If you want to use both inline attachment and Base64 depending on the image, you can specify the embedding method as the `data-auto-embed` attribute value:   
+
+```html
+<p>
+    <img src="https://domain.com/logo.png" data-auto-embed="base64">
+</p>
+<p>
+    <img src="https://domain.com/item.png" data-auto-embed="attachment">
 </p>
 ```
 
@@ -153,26 +181,5 @@ Then, you can use the `embed:ClassName:id` syntax in your e-mail template:
 ```html
 <p>
     <img src="embed:App\Models\Picture:123">
-</p>
-```
-
-
-## Base64 embedding
-
-If you prefer to use Base64 instead of inline attachments, you can do so by setting the `MAIL_AUTO_EMBED_METHOD` environment variable to `base64`. 
-
-Note that it will increase the e-mail size, and that it won't be decoded by some e-mail clients such as Gmail.
-
-
-## Mixed embedding methods
-
-If you want to use both inline attachment and Base64 depending on the image, you can specify the embedding method as the `data-auto-embed` attribute value:   
-
-```html
-<p>
-    <img src="https://domain.com/logo.png" data-auto-embed="base64">
-</p>
-<p>
-    <img src="https://domain.com/item.png" data-auto-embed="attachment">
 </p>
 ```
