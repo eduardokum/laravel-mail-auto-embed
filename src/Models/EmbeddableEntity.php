@@ -6,7 +6,7 @@ interface EmbeddableEntity
 {
     /**
      * @param  mixed  $id
-     * @return EmbeddableEntity
+     * @return EmbeddableEntity|null
      */
     public static function findEmbeddable($id);
 

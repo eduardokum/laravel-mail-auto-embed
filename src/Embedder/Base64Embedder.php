@@ -14,6 +14,10 @@ class Base64Embedder extends Embedder
     {
         $filePath = str_replace(url('/'), public_path('/'), $url);
 
+        if (!file_exists($filePath)) {
+            return $url;
+        }
+
         return $this->base64String(mime_content_type($filePath), file_get_contents($filePath));
     }
 
