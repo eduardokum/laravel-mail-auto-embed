@@ -20,6 +20,8 @@
         "illuminate/mail": ">=5.3"
     },
     "require-dev": {
+        "orchestra/testbench": "~3.0",
+        "phpunit/phpunit": "~5.0|~6.0"
     },
     "autoload": {
         "psr-4": {
@@ -34,7 +36,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Eduardokum\\LaravelMailAutoEmbed\\Providers\\LaravelMailAutoEmbedServiceProvider"
+                "Eduardokum\\LaravelMailAutoEmbed\\ServiceProvider"
             ]
         }
     }
