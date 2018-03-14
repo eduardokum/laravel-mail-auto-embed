@@ -73,7 +73,13 @@ simply add the attribute `data-skip-embed` in the image tag:
 ```html
 <img src="https://domain.com/logo.png" data-skip-embed class="img-header">
 ```
+### Local resources
 
+For local resources that are not available publicly, use `file://` urls, example
+
+```html
+<img src="file://{{ resource_path('assets/img/logo.png') }}" alt="Logo" border="0"/>
+```
 
 ## Configuration
 
