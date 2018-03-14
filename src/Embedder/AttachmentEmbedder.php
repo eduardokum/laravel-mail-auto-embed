@@ -2,17 +2,17 @@
 
 namespace Eduardokum\LaravelMailAutoEmbed\Embedder;
 
-use Eduardokum\LaravelMailAutoEmbed\Models\EmbeddableEntity;
-use Swift_EmbeddedFile;
 use Swift_Image;
 use Swift_Message;
+use Swift_EmbeddedFile;
+use Eduardokum\LaravelMailAutoEmbed\Models\EmbeddableEntity;
 
 class AttachmentEmbedder extends Embedder
 {
     /**
      * @var  Swift_Message
      */
-    private $message;
+    protected $message;
 
     /**
      * AttachmentEmbedder constructor.
@@ -57,7 +57,7 @@ class AttachmentEmbedder extends Embedder
      * @param  Swift_EmbeddedFile  $attachment
      * @return string
      */
-    private function embed(Swift_EmbeddedFile $attachment)
+    protected function embed(Swift_EmbeddedFile $attachment)
     {
         return $this->message->embed($attachment);
     }
