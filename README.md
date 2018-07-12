@@ -189,3 +189,13 @@ Then, you can use the `embed:ClassName:id` syntax in your e-mail template:
     <img src="embed:App\Models\Picture:123">
 </p>
 ```
+
+
+## Contributing
+Please feel free to submit pull requests if you can improve or add any features.
+
+We are currently using PSR-2. This is easy to implement and check with the PHP Coding Standards Fixer.
+
+<a target="_blank" href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=QPDFT3UXS6PTL&lc=GB&item_name=laravel%2dmail%2dauto%2dembed&item_number=laravel%2dmail%2dauto%2dembed&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted">
+        <img alt="Donate with Paypal" src="https://www.paypalobjects.com/en_US/GB/i/btn/btn_donateCC_LG.gif"/></a>
+
