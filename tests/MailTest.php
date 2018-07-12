@@ -51,14 +51,18 @@ class MailTest extends TestCase
     public function images_are_automatically_embedded_when_enabled()
     {
         $htmlMessage = <<<HTML
-<!-- url    --><img src="http://localhost/test.png" />
-<!-- entity --><img src="embed:Eduardokum\\LaravelMailAutoEmbed\\Tests\\fixtures\\PictureEntity:1" />
+<!-- url                --><img src="http://localhost/test.png" />
+<!-- url line break     --><img 
+                                src="http://localhost/test.png" 
+                            />
+<!--                    entity --><img src="embed:Eduardokum\\LaravelMailAutoEmbed\\Tests\\fixtures\\PictureEntity:1" />
 HTML;
 
         $message = $this->handleBeforeSendPerformedEvent($htmlMessage, ['enabled' => true, 'method' => 'attachment']);
 
-        $this->assertContains('<!-- url    --><img src="cid:',    $message->getBody());
-        $this->assertContains('<!-- entity --><img src="cid:', $message->getBody());
+        $this->assertContains('<!-- url                --><img src="cid:',    $message->getBody());
+        $this->assertContains('<!-- url line break     --><img src="cid:',    $message->getBody());
+        $this->assertContains('<!--                    entity --><img src="cid:', $message->getBody());
     }
 
     /**
