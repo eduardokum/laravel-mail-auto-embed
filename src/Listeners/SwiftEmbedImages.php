@@ -57,7 +57,7 @@ class SwiftEmbedImages implements Swift_Events_SendListener
     {
         $html_body = $this->message->getBody();
 
-        $html_body = preg_replace_callback('/<img.*src="(.*?)"\s?(.*)?>/', [$this, 'replaceCallback'], $html_body);
+        $html_body = preg_replace_callback('/<img.*src="(.*?)"\s?(.*)?>/s', [$this, 'replaceCallback'], $html_body);
 
         $this->message->setBody($html_body);
     }
