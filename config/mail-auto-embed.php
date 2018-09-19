@@ -25,4 +25,5 @@ return [
 
     'method' => env('MAIL_AUTO_EMBED_METHOD', 'attachment'),
 
+    'whitelist' => explode(',', env('MAIL_AUTO_EMBED_WHITELIST', '')),
 ];
