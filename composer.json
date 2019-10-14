@@ -14,14 +14,14 @@
         }
     ],
     "require": {
-        "php" : ">=5.5.0",
-        "illuminate/contracts": ">=5.3",
-        "illuminate/support": ">=5.3",
-        "illuminate/mail": ">=5.3"
+        "php" : ">=5.5.0,<8.0",
+        "illuminate/contracts": ">=5.3,<7.0",
+        "illuminate/support": ">=5.3,<7.0",
+        "illuminate/mail": ">=5.3,<7.0"
     },
     "require-dev": {
-        "orchestra/testbench": "~3.0",
-        "phpunit/phpunit": "~5.0|~6.0"
+        "orchestra/testbench": ">3.0,<4.0",
+        "phpunit/phpunit": ">=5.0,<9.0"
     },
     "autoload": {
         "psr-4": {
