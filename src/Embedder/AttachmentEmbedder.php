@@ -5,6 +5,7 @@ namespace Eduardokum\LaravelMailAutoEmbed\Embedder;
 use Swift_Image;
 use Swift_Message;
 use Swift_EmbeddedFile;
+use Illuminate\Support\Str;
 use Eduardokum\LaravelMailAutoEmbed\Models\EmbeddableEntity;
 
 class AttachmentEmbedder extends Embedder
@@ -61,7 +62,7 @@ class AttachmentEmbedder extends Embedder
             curl_close($ch);
             if ($httpcode == 200) {
                 return $this->embed(
-                    new Swift_Image($raw, str_random(10), $contentType)
+                    new Swift_Image($raw, Str::random(10), $contentType)
                 );
             }
         }
