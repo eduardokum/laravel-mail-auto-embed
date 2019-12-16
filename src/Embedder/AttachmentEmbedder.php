@@ -50,7 +50,7 @@ class AttachmentEmbedder extends Embedder
      */
     public function fromRemoteUrl($url)
     {
-        if (strpos($url, 'http') === 0 && $this->isUrlInWhitelist($url)) {
+        if ($this->isUrlInWhitelist($url)) {
             $ch = curl_init($url);
             curl_setopt($ch, CURLOPT_HEADER, 0);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
@@ -87,22 +87,16 @@ class AttachmentEmbedder extends Embedder
     }
 
     /**
-     * @param  Swift_EmbeddedFile  $attachment
-     *
-     * @return string
-     */
-    protected function embed(Swift_EmbeddedFile $attachment)
-    {
-        return $this->message->embed($attachment);
-    }
-
-    /**
      * @param  string $url
      *
      * @return bool
      */
-    protected function isUrlInWhitelist($url)
+    public function isUrlInWhitelist($url)
     {
+        if (strpos($url, 'http') !== 0) {
+            return false;
+        }
+
         $whitelisted_urls = config('mail-auto-embed.whitelist', []);
 
         foreach ($whitelisted_urls as $whitelist_url) {
@@ -112,5 +106,15 @@ class AttachmentEmbedder extends Embedder
         }
 
         return false;
+    }
+
+    /**
+     * @param  Swift_EmbeddedFile  $attachment
+     *
+     * @return string
+     */
+    protected function embed(Swift_EmbeddedFile $attachment)
+    {
+        return $this->message->embed($attachment);
     }
 }

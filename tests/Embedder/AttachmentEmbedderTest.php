@@ -19,25 +19,25 @@ class AttachmentEmbedderTest extends TestCase
     /**
      * @test
      */
-    public function whitelisted_domains_return_image()
+    public function whitelisted_domains_are_verified()
     {
         config(['mail-auto-embed.whitelist' => [
-            'http://example.com',
+            'https://placehold.it',
         ]]);
 
-        $this->assertNotNull(app(AttachmentEmbedder::class)->fromRemoteUrl('http://example.com'));
+        $this->assertTrue(app(AttachmentEmbedder::class)->isUrlInWhitelist('https://placehold.it/200?text=event%20logo'));
     }
 
     /**
      * @test
      */
-    public function domains_must_be_whitelisted()
+    public function non_whitelisted_domains_are_denied()
     {
         config(['mail-auto-embed.whitelist' => [
             'http://example.com',
         ]]);
 
-        $this->assertNull(app(AttachmentEmbedder::class)->fromRemoteUrl('http://not-whitelisted.com'));
+        $this->assertFalse(app(AttachmentEmbedder::class)->isUrlInWhitelist('https://placehold.it/200?text=event%20logo'));
     }
 
     /**
