@@ -2,40 +2,42 @@
 
 namespace Rsvpify\LaravelMailAutoEmbed\Tests\Embedder;
 
+use Swift_Message;
+use Swift_EmbeddedFile;
+use Rsvpify\LaravelMailAutoEmbed\Tests\TestCase;
 use Rsvpify\LaravelMailAutoEmbed\Embedder\AttachmentEmbedder;
 use Rsvpify\LaravelMailAutoEmbed\Tests\fixtures\PictureEntity;
-use Rsvpify\LaravelMailAutoEmbed\Tests\TestCase;
-use Swift_EmbeddedFile;
-use Swift_Message;
 
 class AttachmentEmbedderTest extends TestCase
 {
-    /** @var  Swift_Message */
+    /** @var Swift_Message */
     private $message;
 
-    /** @var  AttachmentEmbedder */
+    /** @var AttachmentEmbedder */
     private $embedder;
 
-    protected function setUp()
+    /**
+     * @test
+     */
+    public function whitelisted_domains_return_image()
     {
-        parent::setUp();
+        config(['mail-auto-embed.whitelist' => [
+            'http://example.com',
+        ]]);
 
-        $this->message = new Swift_Message();
-        $this->embedder = new AttachmentEmbedder($this->message);
+        $this->assertNotNull(app(AttachmentEmbedder::class)->fromRemoteUrl('http://example.com'));
     }
 
     /**
-     * @return int
+     * @test
      */
-    private function getEmbeddedFilesCount()
+    public function domains_must_be_whitelisted()
     {
-        return collect($this->message->getChildren())
-            ->filter(
-                function ($item) {
-                    return $item instanceof Swift_EmbeddedFile;
-                }
-            )
-            ->count();
+        config(['mail-auto-embed.whitelist' => [
+            'http://example.com',
+        ]]);
+
+        $this->assertNull(app(AttachmentEmbedder::class)->fromRemoteUrl('http://not-whitelisted.com'));
     }
 
     /**
@@ -62,5 +64,27 @@ class AttachmentEmbedderTest extends TestCase
         $this->assertStringStartsWith('cid:', $result);
 
         $this->assertEquals(1, $this->getEmbeddedFilesCount());
+    }
+
+    protected function setUp()
+    {
+        parent::setUp();
+
+        $this->message = new Swift_Message();
+        $this->embedder = new AttachmentEmbedder($this->message);
+    }
+
+    /**
+     * @return int
+     */
+    private function getEmbeddedFilesCount()
+    {
+        return collect($this->message->getChildren())
+            ->filter(
+                function ($item) {
+                    return $item instanceof Swift_EmbeddedFile;
+                }
+            )
+            ->count();
     }
 }
