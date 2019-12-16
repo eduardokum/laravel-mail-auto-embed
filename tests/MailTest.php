@@ -2,6 +2,10 @@
 
 namespace Rsvpify\LaravelMailAutoEmbed\Tests;
 
+use Swift_Message;
+use Swift_Events_SendEvent;
+use Swift_Transport_NullTransport;
+use Swift_Events_SimpleEventDispatcher;
 use Rsvpify\LaravelMailAutoEmbed\Listeners\SwiftEmbedImages;
 
 class MailTest extends TestCase
@@ -163,25 +167,25 @@ HTML;
     /**
      * @param  string  $htmlMessage
      *
-     * @return \Swift_Message
+     * @return Swift_Message
      */
     private function createSwiftMessage($htmlMessage)
     {
-        $message = new \Swift_Message('test', $htmlMessage);
+        $message = new Swift_Message('test', $htmlMessage);
 
         return $message;
     }
 
     /**
-     * @param  \Swift_Message  $message
+     * @param  Swift_Message  $message
      *
-     * @return \Swift_Events_SendEvent
+     * @return Swift_Events_SendEvent
      */
-    private function createSwiftEvent(\Swift_Message $message)
+    private function createSwiftEvent(Swift_Message $message)
     {
-        $dispatcher = new \Swift_Events_SimpleEventDispatcher();
-        $transport = new \Swift_Transport_NullTransport($dispatcher);
-        $event = new \Swift_Events_SendEvent($transport, $message);
+        $dispatcher = new Swift_Events_SimpleEventDispatcher();
+        $transport = new Swift_Transport_NullTransport($dispatcher);
+        $event = new Swift_Events_SendEvent($transport, $message);
 
         return $event;
     }
@@ -190,7 +194,7 @@ HTML;
      * @param  string  $htmlMessage
      * @param  array   $options
      *
-     * @return \Swift_Message
+     * @return Swift_Message
      */
     private function handleBeforeSendPerformedEvent($htmlMessage, $options)
     {

@@ -97,10 +97,10 @@ class AttachmentEmbedder extends Embedder
             return false;
         }
 
-        $whitelisted_urls = config('mail-auto-embed.whitelist', []);
+        $whitelistedUrls = config('mail-auto-embed.whitelist', []);
 
-        foreach ($whitelisted_urls as $whitelist_url) {
-            if (strpos($url, $whitelist_url) === 0) {
+        foreach ($whitelistedUrls as $whitelistedUrl) {
+            if (strpos($url, $whitelistedUrl) === 0) {
                 return true;
             }
         }
