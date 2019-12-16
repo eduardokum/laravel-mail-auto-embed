@@ -1,8 +1,8 @@
 <?php
 
-namespace Eduardokum\LaravelMailAutoEmbed;
+namespace Rsvpify\LaravelMailAutoEmbed;
 
-use Eduardokum\LaravelMailAutoEmbed\Listeners\SwiftEmbedImages;
+use Rsvpify\LaravelMailAutoEmbed\Listeners\SwiftEmbedImages;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
 

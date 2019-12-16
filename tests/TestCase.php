@@ -1,6 +1,6 @@
 <?php
 
-namespace Eduardokum\LaravelMailAutoEmbed\Tests;
+namespace Rsvpify\LaravelMailAutoEmbed\Tests;
 
 class TestCase extends \Orchestra\Testbench\TestCase
 {
@@ -21,6 +21,6 @@ class TestCase extends \Orchestra\Testbench\TestCase
      */
     protected function getPackageProviders($app)
     {
-        return [\Eduardokum\LaravelMailAutoEmbed\ServiceProvider::class];
+        return [\Rsvpify\LaravelMailAutoEmbed\ServiceProvider::class];
     }
 }

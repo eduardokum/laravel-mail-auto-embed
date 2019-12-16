@@ -1,16 +1,16 @@
 {
-    "name": "eduardokum/laravel-mail-auto-embed",
+    "name": "rsvpify/laravel-mail-auto-embed",
     "description": "Library for embed images in emails automatically",
     "keywords": [
-        "eduardokum",
+        "rsvpify",
         "laravel-mail-auto-embed"
     ],
-    "homepage": "https://github.com/eduardokum/laravel-mail-auto-embed",
+    "homepage": "https://github.com/rsvpify/laravel-mail-auto-embed",
     "license": "MIT",
     "authors": [
         {
-            "name": "Eduardo Gusmão",
-            "email": "eduguscontra3@hotmail.com"
+            "name": "Bryan Miller",
+            "email": "bryan@kirschbaumdevelopment.com"
         }
     ],
     "require": {
@@ -25,18 +25,18 @@
     },
     "autoload": {
         "psr-4": {
-            "Eduardokum\\LaravelMailAutoEmbed\\": "src"
+            "Rsvpify\\LaravelMailAutoEmbed\\": "src"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Eduardokum\\LaravelMailAutoEmbed\\Tests\\": "tests"
+            "Rsvpify\\LaravelMailAutoEmbed\\Tests\\": "tests"
         }
     },
     "extra": {
         "laravel": {
             "providers": [
-                "Eduardokum\\LaravelMailAutoEmbed\\ServiceProvider"
+                "Rsvpify\\LaravelMailAutoEmbed\\ServiceProvider"
             ]
         }
     }

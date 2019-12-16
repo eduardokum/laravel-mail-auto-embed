@@ -1,6 +1,6 @@
 <?php
 
-namespace Eduardokum\LaravelMailAutoEmbed\Embedder;
+namespace Rsvpify\LaravelMailAutoEmbed\Embedder;
 
 interface UrlEmbedder
 {

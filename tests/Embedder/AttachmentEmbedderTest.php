@@ -1,10 +1,10 @@
 <?php
 
-namespace Eduardokum\LaravelMailAutoEmbed\Tests\Embedder;
+namespace Rsvpify\LaravelMailAutoEmbed\Tests\Embedder;
 
-use Eduardokum\LaravelMailAutoEmbed\Embedder\AttachmentEmbedder;
-use Eduardokum\LaravelMailAutoEmbed\Tests\fixtures\PictureEntity;
-use Eduardokum\LaravelMailAutoEmbed\Tests\TestCase;
+use Rsvpify\LaravelMailAutoEmbed\Embedder\AttachmentEmbedder;
+use Rsvpify\LaravelMailAutoEmbed\Tests\fixtures\PictureEntity;
+use Rsvpify\LaravelMailAutoEmbed\Tests\TestCase;
 use Swift_EmbeddedFile;
 use Swift_Message;
 

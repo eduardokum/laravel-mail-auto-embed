@@ -1,6 +1,6 @@
 <?php
 
-namespace Eduardokum\LaravelMailAutoEmbed\Models;
+namespace Rsvpify\LaravelMailAutoEmbed\Models;
 
 interface EmbeddableEntity
 {

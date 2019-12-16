@@ -1,8 +1,8 @@
 <?php
 
-namespace Eduardokum\LaravelMailAutoEmbed\Tests;
+namespace Rsvpify\LaravelMailAutoEmbed\Tests;
 
-use Eduardokum\LaravelMailAutoEmbed\Listeners\SwiftEmbedImages;
+use Rsvpify\LaravelMailAutoEmbed\Listeners\SwiftEmbedImages;
 
 class MailTest extends TestCase
 {
@@ -55,7 +55,7 @@ class MailTest extends TestCase
 <!-- url line break     --><img 
                                 src="http://localhost/test.png" 
                             />
-<!--                    entity --><img src="embed:Eduardokum\\LaravelMailAutoEmbed\\Tests\\fixtures\\PictureEntity:1" />
+<!--                    entity --><img src="embed:Rsvpify\\LaravelMailAutoEmbed\\Tests\\fixtures\\PictureEntity:1" />
 HTML;
 
         $message = $this->handleBeforeSendPerformedEvent($htmlMessage, ['enabled' => true, 'method' => 'attachment']);
@@ -134,14 +134,18 @@ HTML;
      */
     public function embed_fails_gracefully_with_attachments()
     {
+        config(['mail-auto-embed.whitelist' => [
+            'http://example.com'
+        ]]);
+
         $htmlMessage = <<<HTML
 <!-- host           --><img src="http://example.com/test.png" />
 <!-- image          --><img src="http://localhost/other.png" />
 <!-- source         --><img src="whatever" />
 <!-- syntax         --><img src="embed:whatever" />
 <!-- class          --><img src="embed:WrongEntityClassName:1" />
-<!-- implementation --><img src="embed:Eduardokum\\LaravelMailAutoEmbed\\Tests\\fixtures\\WrongEntity:1" />
-<!-- not found      --><img src="embed:Eduardokum\\LaravelMailAutoEmbed\\Tests\\fixtures\\PictureEntity:9" />
+<!-- implementation --><img src="embed:Rsvpify\\LaravelMailAutoEmbed\\Tests\\fixtures\\WrongEntity:1" />
+<!-- not found      --><img src="embed:Rsvpify\\LaravelMailAutoEmbed\\Tests\\fixtures\\PictureEntity:9" />
 HTML;
 
         $message = $this->handleBeforeSendPerformedEvent($htmlMessage, ['enabled' => true, 'method' => 'attachment']);
@@ -151,8 +155,8 @@ HTML;
         $this->assertContains('<!-- source         --><img src="whatever',                                                                 $message->getBody());
         $this->assertContains('<!-- syntax         --><img src="embed:whatever',                                                           $message->getBody());
         $this->assertContains('<!-- class          --><img src="embed:WrongEntityClassName:1',                                             $message->getBody());
-        $this->assertContains('<!-- implementation --><img src="embed:Eduardokum\\LaravelMailAutoEmbed\\Tests\\fixtures\\WrongEntity:1',   $message->getBody());
-        $this->assertContains('<!-- not found      --><img src="embed:Eduardokum\\LaravelMailAutoEmbed\\Tests\\fixtures\\PictureEntity:9', $message->getBody());
+        $this->assertContains('<!-- implementation --><img src="embed:Rsvpify\\LaravelMailAutoEmbed\\Tests\\fixtures\\WrongEntity:1',   $message->getBody());
+        $this->assertContains('<!-- not found      --><img src="embed:Rsvpify\\LaravelMailAutoEmbed\\Tests\\fixtures\\PictureEntity:9', $message->getBody());
     }
 
     /**
@@ -166,8 +170,8 @@ HTML;
 <!-- source         --><img src="whatever" />
 <!-- syntax         --><img src="embed:whatever" />
 <!-- class          --><img src="embed:WrongEntityClassName:1" />
-<!-- implementation --><img src="embed:Eduardokum\\LaravelMailAutoEmbed\\Tests\\fixtures\\WrongEntity:1" />
-<!-- not found      --><img src="embed:Eduardokum\\LaravelMailAutoEmbed\\Tests\\fixtures\\PictureEntity:9" />
+<!-- implementation --><img src="embed:Rsvpify\\LaravelMailAutoEmbed\\Tests\\fixtures\\WrongEntity:1" />
+<!-- not found      --><img src="embed:Rsvpify\\LaravelMailAutoEmbed\\Tests\\fixtures\\PictureEntity:9" />
 HTML;
 
         $message = $this->handleBeforeSendPerformedEvent($htmlMessage, ['enabled' => true, 'method' => 'base64']);
@@ -177,8 +181,8 @@ HTML;
         $this->assertContains('<!-- source         --><img src="whatever',                                                                 $message->getBody());
         $this->assertContains('<!-- syntax         --><img src="embed:whatever',                                                           $message->getBody());
         $this->assertContains('<!-- class          --><img src="embed:WrongEntityClassName:1',                                             $message->getBody());
-        $this->assertContains('<!-- implementation --><img src="embed:Eduardokum\\LaravelMailAutoEmbed\\Tests\\fixtures\\WrongEntity:1',   $message->getBody());
-        $this->assertContains('<!-- not found      --><img src="embed:Eduardokum\\LaravelMailAutoEmbed\\Tests\\fixtures\\PictureEntity:9', $message->getBody());
+        $this->assertContains('<!-- implementation --><img src="embed:Rsvpify\\LaravelMailAutoEmbed\\Tests\\fixtures\\WrongEntity:1',   $message->getBody());
+        $this->assertContains('<!-- not found      --><img src="embed:Rsvpify\\LaravelMailAutoEmbed\\Tests\\fixtures\\PictureEntity:9', $message->getBody());
     }
 
     /**

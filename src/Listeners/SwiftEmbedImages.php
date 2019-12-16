@@ -1,11 +1,11 @@
 <?php
 
-namespace Eduardokum\LaravelMailAutoEmbed\Listeners;
+namespace Rsvpify\LaravelMailAutoEmbed\Listeners;
 
-use Eduardokum\LaravelMailAutoEmbed\Embedder\AttachmentEmbedder;
-use Eduardokum\LaravelMailAutoEmbed\Embedder\Base64Embedder;
-use Eduardokum\LaravelMailAutoEmbed\Embedder\Embedder;
-use Eduardokum\LaravelMailAutoEmbed\Models\EmbeddableEntity;
+use Rsvpify\LaravelMailAutoEmbed\Embedder\AttachmentEmbedder;
+use Rsvpify\LaravelMailAutoEmbed\Embedder\Base64Embedder;
+use Rsvpify\LaravelMailAutoEmbed\Embedder\Embedder;
+use Rsvpify\LaravelMailAutoEmbed\Models\EmbeddableEntity;
 use ReflectionClass;
 use Swift_Events_SendEvent;
 use Swift_Events_SendListener;
