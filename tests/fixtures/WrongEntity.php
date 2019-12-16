@@ -1,8 +1,7 @@
 <?php
 
-namespace Eduardokum\LaravelMailAutoEmbed\Tests\fixtures;
+namespace Rsvpify\LaravelMailAutoEmbed\Tests\fixtures;
 
 class WrongEntity
 {
-
 }

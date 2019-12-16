@@ -1,8 +1,8 @@
 <?php
 
-namespace Eduardokum\LaravelMailAutoEmbed\Embedder;
+namespace Rsvpify\LaravelMailAutoEmbed\Embedder;
 
-use Eduardokum\LaravelMailAutoEmbed\Models\EmbeddableEntity;
+use Rsvpify\LaravelMailAutoEmbed\Models\EmbeddableEntity;
 
 class Base64Embedder extends Embedder
 {

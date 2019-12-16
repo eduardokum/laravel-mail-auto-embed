@@ -1,8 +1,7 @@
 <?php
 
-namespace Eduardokum\LaravelMailAutoEmbed\Embedder;
+namespace Rsvpify\LaravelMailAutoEmbed\Embedder;
 
 abstract class Embedder implements UrlEmbedder, EntityEmbedder
 {
-
 }

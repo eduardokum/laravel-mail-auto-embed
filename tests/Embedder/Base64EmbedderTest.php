@@ -1,20 +1,13 @@
 <?php
 
-namespace Eduardokum\LaravelMailAutoEmbed\Tests\Embedder;
+namespace Rsvpify\LaravelMailAutoEmbed\Tests\Embedder;
 
-use Eduardokum\LaravelMailAutoEmbed\Embedder\Base64Embedder;
-use Eduardokum\LaravelMailAutoEmbed\Tests\fixtures\PictureEntity;
-use Eduardokum\LaravelMailAutoEmbed\Tests\TestCase;
+use Rsvpify\LaravelMailAutoEmbed\Tests\TestCase;
+use Rsvpify\LaravelMailAutoEmbed\Embedder\Base64Embedder;
+use Rsvpify\LaravelMailAutoEmbed\Tests\fixtures\PictureEntity;
 
 class Base64EmbedderTest extends TestCase
 {
-    protected function setUp()
-    {
-        parent::setUp();
-
-        $this->embedder = new Base64Embedder();
-    }
-
     /**
      * @test
      */
@@ -39,5 +32,12 @@ class Base64EmbedderTest extends TestCase
         $result = $embedder->fromEntity($picture);
 
         $this->assertStringStartsWith('data:image/png;base64,', $result);
+    }
+
+    protected function setUp()
+    {
+        parent::setUp();
+
+        $this->embedder = new Base64Embedder();
     }
 }

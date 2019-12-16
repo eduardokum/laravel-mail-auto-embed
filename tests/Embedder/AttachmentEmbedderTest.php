@@ -1,41 +1,43 @@
 <?php
 
-namespace Eduardokum\LaravelMailAutoEmbed\Tests\Embedder;
+namespace Rsvpify\LaravelMailAutoEmbed\Tests\Embedder;
 
-use Eduardokum\LaravelMailAutoEmbed\Embedder\AttachmentEmbedder;
-use Eduardokum\LaravelMailAutoEmbed\Tests\fixtures\PictureEntity;
-use Eduardokum\LaravelMailAutoEmbed\Tests\TestCase;
-use Swift_EmbeddedFile;
 use Swift_Message;
+use Swift_EmbeddedFile;
+use Rsvpify\LaravelMailAutoEmbed\Tests\TestCase;
+use Rsvpify\LaravelMailAutoEmbed\Embedder\AttachmentEmbedder;
+use Rsvpify\LaravelMailAutoEmbed\Tests\fixtures\PictureEntity;
 
 class AttachmentEmbedderTest extends TestCase
 {
-    /** @var  Swift_Message */
+    /** @var Swift_Message */
     private $message;
 
-    /** @var  AttachmentEmbedder */
+    /** @var AttachmentEmbedder */
     private $embedder;
 
-    protected function setUp()
+    /**
+     * @test
+     */
+    public function whitelisted_domains_are_verified()
     {
-        parent::setUp();
+        config(['mail-auto-embed.whitelist' => [
+            'https://placehold.it',
+        ]]);
 
-        $this->message = new Swift_Message();
-        $this->embedder = new AttachmentEmbedder($this->message);
+        $this->assertTrue(app(AttachmentEmbedder::class)->isUrlInWhitelist('https://placehold.it/200?text=event%20logo'));
     }
 
     /**
-     * @return int
+     * @test
      */
-    private function getEmbeddedFilesCount()
+    public function non_whitelisted_domains_are_denied()
     {
-        return collect($this->message->getChildren())
-            ->filter(
-                function ($item) {
-                    return $item instanceof Swift_EmbeddedFile;
-                }
-            )
-            ->count();
+        config(['mail-auto-embed.whitelist' => [
+            'http://example.com',
+        ]]);
+
+        $this->assertFalse(app(AttachmentEmbedder::class)->isUrlInWhitelist('https://placehold.it/200?text=event%20logo'));
     }
 
     /**
@@ -62,5 +64,27 @@ class AttachmentEmbedderTest extends TestCase
         $this->assertStringStartsWith('cid:', $result);
 
         $this->assertEquals(1, $this->getEmbeddedFilesCount());
+    }
+
+    protected function setUp()
+    {
+        parent::setUp();
+
+        $this->message = new Swift_Message();
+        $this->embedder = new AttachmentEmbedder($this->message);
+    }
+
+    /**
+     * @return int
+     */
+    private function getEmbeddedFilesCount()
+    {
+        return collect($this->message->getChildren())
+            ->filter(
+                function ($item) {
+                    return $item instanceof Swift_EmbeddedFile;
+                }
+            )
+            ->count();
     }
 }

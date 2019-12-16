@@ -1,50 +1,15 @@
 <?php
 
-namespace Eduardokum\LaravelMailAutoEmbed\Tests;
+namespace Rsvpify\LaravelMailAutoEmbed\Tests;
 
-use Eduardokum\LaravelMailAutoEmbed\Listeners\SwiftEmbedImages;
+use Swift_Message;
+use Swift_Events_SendEvent;
+use Swift_Transport_NullTransport;
+use Swift_Events_SimpleEventDispatcher;
+use Rsvpify\LaravelMailAutoEmbed\Listeners\SwiftEmbedImages;
 
 class MailTest extends TestCase
 {
-    /**
-     * @param  string  $htmlMessage
-     * @return \Swift_Message
-     */
-    private function createSwiftMessage($htmlMessage)
-    {
-        $message = new \Swift_Message('test', $htmlMessage);
-
-        return $message;
-    }
-
-    /**
-     * @param  \Swift_Message  $message
-     * @return \Swift_Events_SendEvent
-     */
-    private function createSwiftEvent(\Swift_Message $message)
-    {
-        $dispatcher = new \Swift_Events_SimpleEventDispatcher();
-        $transport = new \Swift_Transport_NullTransport($dispatcher);
-        $event = new \Swift_Events_SendEvent($transport, $message);
-
-        return $event;
-    }
-
-    /**
-     * @param  string  $htmlMessage
-     * @param  array   $options
-     * @return \Swift_Message
-     */
-    private function handleBeforeSendPerformedEvent($htmlMessage, $options)
-    {
-        $message = $this->createSwiftMessage($htmlMessage);
-
-        $embedPlugin = new SwiftEmbedImages($options);
-        $embedPlugin->beforeSendPerformed($this->createSwiftEvent($message));
-
-        return $message;
-    }
-
     /**
      * @test
      */
@@ -55,13 +20,13 @@ class MailTest extends TestCase
 <!-- url line break     --><img 
                                 src="http://localhost/test.png" 
                             />
-<!--                    entity --><img src="embed:Eduardokum\\LaravelMailAutoEmbed\\Tests\\fixtures\\PictureEntity:1" />
+<!--                    entity --><img src="embed:Rsvpify\\LaravelMailAutoEmbed\\Tests\\fixtures\\PictureEntity:1" />
 HTML;
 
         $message = $this->handleBeforeSendPerformedEvent($htmlMessage, ['enabled' => true, 'method' => 'attachment']);
 
-        $this->assertContains('<!-- url                --><img src="cid:',    $message->getBody());
-        $this->assertContains('<!-- url line break     --><img src="cid:',    $message->getBody());
+        $this->assertContains('<!-- url                --><img src="cid:', $message->getBody());
+        $this->assertContains('<!-- url line break     --><img src="cid:', $message->getBody());
         $this->assertContains('<!--                    entity --><img src="cid:', $message->getBody());
     }
 
@@ -77,7 +42,7 @@ HTML;
 
         $message = $this->handleBeforeSendPerformedEvent($htmlMessage, ['enabled' => true, 'method' => 'attachment']);
 
-        $this->assertContains('<!-- embed --><img src="cid:',                      $message->getBody());
+        $this->assertContains('<!-- embed --><img src="cid:', $message->getBody());
         $this->assertContains('<!-- skip  --><img src="http://localhost/test.png', $message->getBody());
     }
 
@@ -94,7 +59,7 @@ HTML;
         $message = $this->handleBeforeSendPerformedEvent($htmlMessage, ['enabled' => false, 'method' => 'attachment']);
 
         $this->assertContains('<!-- ignore --><img src="http://localhost/test.png', $message->getBody());
-        $this->assertContains('<!-- embed  --><img src="cid:',                      $message->getBody());
+        $this->assertContains('<!-- embed  --><img src="cid:', $message->getBody());
     }
 
     /**
@@ -109,7 +74,7 @@ HTML;
 
         $message = $this->handleBeforeSendPerformedEvent($htmlMessage, ['enabled' => true, 'method' => 'attachment']);
 
-        $this->assertContains('<!-- attachment --><img src="cid:',                   $message->getBody());
+        $this->assertContains('<!-- attachment --><img src="cid:', $message->getBody());
         $this->assertContains('<!-- base64     --><img src="data:image/png;base64,', $message->getBody());
     }
 
@@ -125,7 +90,7 @@ HTML;
 
         $message = $this->handleBeforeSendPerformedEvent($htmlMessage, ['enabled' => true, 'method' => 'base64']);
 
-        $this->assertContains('<!-- attachment --><img src="cid:',                   $message->getBody());
+        $this->assertContains('<!-- attachment --><img src="cid:', $message->getBody());
         $this->assertContains('<!-- base64     --><img src="data:image/png;base64,', $message->getBody());
     }
 
@@ -134,25 +99,29 @@ HTML;
      */
     public function embed_fails_gracefully_with_attachments()
     {
+        config(['mail-auto-embed.whitelist' => [
+            'http://example.com',
+        ]]);
+
         $htmlMessage = <<<HTML
 <!-- host           --><img src="http://example.com/test.png" />
 <!-- image          --><img src="http://localhost/other.png" />
 <!-- source         --><img src="whatever" />
 <!-- syntax         --><img src="embed:whatever" />
 <!-- class          --><img src="embed:WrongEntityClassName:1" />
-<!-- implementation --><img src="embed:Eduardokum\\LaravelMailAutoEmbed\\Tests\\fixtures\\WrongEntity:1" />
-<!-- not found      --><img src="embed:Eduardokum\\LaravelMailAutoEmbed\\Tests\\fixtures\\PictureEntity:9" />
+<!-- implementation --><img src="embed:Rsvpify\\LaravelMailAutoEmbed\\Tests\\fixtures\\WrongEntity:1" />
+<!-- not found      --><img src="embed:Rsvpify\\LaravelMailAutoEmbed\\Tests\\fixtures\\PictureEntity:9" />
 HTML;
 
         $message = $this->handleBeforeSendPerformedEvent($htmlMessage, ['enabled' => true, 'method' => 'attachment']);
 
-        $this->assertContains('<!-- host           --><img src="http://example.com/test.png',                                              $message->getBody());
-        $this->assertContains('<!-- image          --><img src="http://localhost/other.png',                                               $message->getBody());
-        $this->assertContains('<!-- source         --><img src="whatever',                                                                 $message->getBody());
-        $this->assertContains('<!-- syntax         --><img src="embed:whatever',                                                           $message->getBody());
-        $this->assertContains('<!-- class          --><img src="embed:WrongEntityClassName:1',                                             $message->getBody());
-        $this->assertContains('<!-- implementation --><img src="embed:Eduardokum\\LaravelMailAutoEmbed\\Tests\\fixtures\\WrongEntity:1',   $message->getBody());
-        $this->assertContains('<!-- not found      --><img src="embed:Eduardokum\\LaravelMailAutoEmbed\\Tests\\fixtures\\PictureEntity:9', $message->getBody());
+        $this->assertContains('<!-- host           --><img src="http://example.com/test.png', $message->getBody());
+        $this->assertContains('<!-- image          --><img src="http://localhost/other.png', $message->getBody());
+        $this->assertContains('<!-- source         --><img src="whatever', $message->getBody());
+        $this->assertContains('<!-- syntax         --><img src="embed:whatever', $message->getBody());
+        $this->assertContains('<!-- class          --><img src="embed:WrongEntityClassName:1', $message->getBody());
+        $this->assertContains('<!-- implementation --><img src="embed:Rsvpify\\LaravelMailAutoEmbed\\Tests\\fixtures\\WrongEntity:1', $message->getBody());
+        $this->assertContains('<!-- not found      --><img src="embed:Rsvpify\\LaravelMailAutoEmbed\\Tests\\fixtures\\PictureEntity:9', $message->getBody());
     }
 
     /**
@@ -166,19 +135,19 @@ HTML;
 <!-- source         --><img src="whatever" />
 <!-- syntax         --><img src="embed:whatever" />
 <!-- class          --><img src="embed:WrongEntityClassName:1" />
-<!-- implementation --><img src="embed:Eduardokum\\LaravelMailAutoEmbed\\Tests\\fixtures\\WrongEntity:1" />
-<!-- not found      --><img src="embed:Eduardokum\\LaravelMailAutoEmbed\\Tests\\fixtures\\PictureEntity:9" />
+<!-- implementation --><img src="embed:Rsvpify\\LaravelMailAutoEmbed\\Tests\\fixtures\\WrongEntity:1" />
+<!-- not found      --><img src="embed:Rsvpify\\LaravelMailAutoEmbed\\Tests\\fixtures\\PictureEntity:9" />
 HTML;
 
         $message = $this->handleBeforeSendPerformedEvent($htmlMessage, ['enabled' => true, 'method' => 'base64']);
 
-        $this->assertContains('<!-- host           --><img src="http://example.com/test.png',                                              $message->getBody());
-        $this->assertContains('<!-- image          --><img src="http://localhost/other.png',                                               $message->getBody());
-        $this->assertContains('<!-- source         --><img src="whatever',                                                                 $message->getBody());
-        $this->assertContains('<!-- syntax         --><img src="embed:whatever',                                                           $message->getBody());
-        $this->assertContains('<!-- class          --><img src="embed:WrongEntityClassName:1',                                             $message->getBody());
-        $this->assertContains('<!-- implementation --><img src="embed:Eduardokum\\LaravelMailAutoEmbed\\Tests\\fixtures\\WrongEntity:1',   $message->getBody());
-        $this->assertContains('<!-- not found      --><img src="embed:Eduardokum\\LaravelMailAutoEmbed\\Tests\\fixtures\\PictureEntity:9', $message->getBody());
+        $this->assertContains('<!-- host           --><img src="http://example.com/test.png', $message->getBody());
+        $this->assertContains('<!-- image          --><img src="http://localhost/other.png', $message->getBody());
+        $this->assertContains('<!-- source         --><img src="whatever', $message->getBody());
+        $this->assertContains('<!-- syntax         --><img src="embed:whatever', $message->getBody());
+        $this->assertContains('<!-- class          --><img src="embed:WrongEntityClassName:1', $message->getBody());
+        $this->assertContains('<!-- implementation --><img src="embed:Rsvpify\\LaravelMailAutoEmbed\\Tests\\fixtures\\WrongEntity:1', $message->getBody());
+        $this->assertContains('<!-- not found      --><img src="embed:Rsvpify\\LaravelMailAutoEmbed\\Tests\\fixtures\\PictureEntity:9', $message->getBody());
     }
 
     /**
@@ -193,5 +162,47 @@ HTML;
         $this->assertTrue(
             $embedPlugin->sendPerformed($this->createSwiftEvent($message))
         );
+    }
+
+    /**
+     * @param  string  $htmlMessage
+     *
+     * @return Swift_Message
+     */
+    private function createSwiftMessage($htmlMessage)
+    {
+        $message = new Swift_Message('test', $htmlMessage);
+
+        return $message;
+    }
+
+    /**
+     * @param  Swift_Message  $message
+     *
+     * @return Swift_Events_SendEvent
+     */
+    private function createSwiftEvent(Swift_Message $message)
+    {
+        $dispatcher = new Swift_Events_SimpleEventDispatcher();
+        $transport = new Swift_Transport_NullTransport($dispatcher);
+        $event = new Swift_Events_SendEvent($transport, $message);
+
+        return $event;
+    }
+
+    /**
+     * @param  string  $htmlMessage
+     * @param  array   $options
+     *
+     * @return Swift_Message
+     */
+    private function handleBeforeSendPerformedEvent($htmlMessage, $options)
+    {
+        $message = $this->createSwiftMessage($htmlMessage);
+
+        $embedPlugin = new SwiftEmbedImages($options);
+        $embedPlugin->beforeSendPerformed($this->createSwiftEvent($message));
+
+        return $message;
     }
 }

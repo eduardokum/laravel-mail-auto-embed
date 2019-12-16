@@ -1,26 +1,31 @@
 <?php
 
-namespace Eduardokum\LaravelMailAutoEmbed\Tests;
+namespace Rsvpify\LaravelMailAutoEmbed\Tests;
+
+use Illuminate\Foundation\Application;
+use Rsvpify\LaravelMailAutoEmbed\ServiceProvider;
 
 class TestCase extends \Orchestra\Testbench\TestCase
 {
     /**
      * Define environment setup.
      *
-     * @param  \Illuminate\Foundation\Application  $app
+     * @param  Application  $app
+     *
      * @return void
      */
     protected function getEnvironmentSetUp($app)
     {
-        $app['path.public'] = __DIR__.'/fixtures';
+        $app['path.public'] = __DIR__ . '/fixtures';
     }
 
     /**
-     * @param  \Illuminate\Foundation\Application  $app
+     * @param  Application  $app
+     *
      * @return array
      */
     protected function getPackageProviders($app)
     {
-        return [\Eduardokum\LaravelMailAutoEmbed\ServiceProvider::class];
+        return [ServiceProvider::class];
     }
 }
