@@ -17,6 +17,7 @@ class AttachmentEmbedder extends Embedder
 
     /**
      * AttachmentEmbedder constructor.
+     *
      * @param  Swift_Message $message
      */
     public function __construct(Swift_Message $message)
@@ -31,7 +32,7 @@ class AttachmentEmbedder extends Embedder
     {
         $filePath = str_replace(url('/'), public_path('/'), $url);
 
-        if ( ! file_exists($filePath)) {
+        if (! file_exists($filePath)) {
             if ($embeddedFromRemoteUrl = $this->fromRemoteUrl($filePath)) {
                 return $embeddedFromRemoteUrl;
             }
@@ -60,6 +61,7 @@ class AttachmentEmbedder extends Embedder
             $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
             $contentType = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
             curl_close($ch);
+
             if ($httpcode == 200) {
                 return $this->embed(
                     new Swift_Image($raw, Str::random(10), $contentType)
@@ -86,6 +88,7 @@ class AttachmentEmbedder extends Embedder
 
     /**
      * @param  Swift_EmbeddedFile  $attachment
+     *
      * @return string
      */
     protected function embed(Swift_EmbeddedFile $attachment)
@@ -93,16 +96,17 @@ class AttachmentEmbedder extends Embedder
         return $this->message->embed($attachment);
     }
 
-
     /**
      * @param  string $url
-     * @return boolean
+     *
+     * @return bool
      */
     protected function isUrlInWhitelist($url)
     {
         $whitelisted_urls = config('mail-auto-embed.whitelist', []);
-        foreach($whitelisted_urls as $whitelist_url) {
-            if(strpos($url, $whitelist_url) === 0) {
+
+        foreach ($whitelisted_urls as $whitelist_url) {
+            if (strpos($url, $whitelist_url) === 0) {
                 return true;
             }
         }

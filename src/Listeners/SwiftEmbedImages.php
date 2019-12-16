@@ -2,14 +2,14 @@
 
 namespace Rsvpify\LaravelMailAutoEmbed\Listeners;
 
-use Rsvpify\LaravelMailAutoEmbed\Embedder\AttachmentEmbedder;
-use Rsvpify\LaravelMailAutoEmbed\Embedder\Base64Embedder;
-use Rsvpify\LaravelMailAutoEmbed\Embedder\Embedder;
-use Rsvpify\LaravelMailAutoEmbed\Models\EmbeddableEntity;
+use Swift_Message;
 use ReflectionClass;
 use Swift_Events_SendEvent;
 use Swift_Events_SendListener;
-use Swift_Message;
+use Rsvpify\LaravelMailAutoEmbed\Embedder\Embedder;
+use Rsvpify\LaravelMailAutoEmbed\Embedder\Base64Embedder;
+use Rsvpify\LaravelMailAutoEmbed\Models\EmbeddableEntity;
+use Rsvpify\LaravelMailAutoEmbed\Embedder\AttachmentEmbedder;
 
 class SwiftEmbedImages implements Swift_Events_SendListener
 {
@@ -43,6 +43,7 @@ class SwiftEmbedImages implements Swift_Events_SendListener
 
     /**
      * @param  Swift_Events_SendEvent  $evt
+     *
      * @return bool
      */
     public function sendPerformed(Swift_Events_SendEvent $evt)
@@ -50,9 +51,6 @@ class SwiftEmbedImages implements Swift_Events_SendListener
         return true;
     }
 
-    /**
-     *
-     */
     private function attachImages()
     {
         $html_body = $this->message->getBody();
@@ -64,25 +62,27 @@ class SwiftEmbedImages implements Swift_Events_SendListener
 
     /**
      * @param  array  $match
+     *
      * @return string
      */
     private function replaceCallback($match)
     {
-        $imageTag   = $match[0];
-        $src        = $match[1];
+        $imageTag = $match[0];
+        $src = $match[1];
         $attributes = $match[2];
 
-        if (!$this->needsEmbed($imageTag)) {
+        if (! $this->needsEmbed($imageTag)) {
             return $imageTag;
         }
 
         $embedder = $this->getEmbedder($imageTag);
 
-        return '<img src="'.$this->embed($embedder, $src).'" '.$attributes.'/>';
+        return '<img src="' . $this->embed($embedder, $src) . '" ' . $attributes . '/>';
     }
 
     /**
      * @param  string  $imageTag
+     *
      * @return bool
      */
     private function needsEmbed($imageTag)
@@ -93,7 +93,7 @@ class SwiftEmbedImages implements Swift_Events_SendListener
         }
 
         // Don't embed if auto-embed is disabled and 'data-auto-embed' is absent
-        if (!$this->config['enabled'] && strpos($imageTag, 'data-auto-embed') === false) {
+        if (! $this->config['enabled'] && strpos($imageTag, 'data-auto-embed') === false) {
             return false;
         }
 
@@ -102,6 +102,7 @@ class SwiftEmbedImages implements Swift_Events_SendListener
 
     /**
      * @param  string  $imageTag
+     *
      * @return Embedder
      */
     private function getEmbedder($imageTag)
@@ -111,7 +112,6 @@ class SwiftEmbedImages implements Swift_Events_SendListener
             : $this->config['method'];
 
         switch ($method) {
-
             case 'attachment':
             default:
                 return new AttachmentEmbedder($this->message);
@@ -124,14 +124,15 @@ class SwiftEmbedImages implements Swift_Events_SendListener
     /**
      * @param  Embedder  $embedder
      * @param  string    $src
+     *
      * @return string
      */
     private function embed(Embedder $embedder, $src)
     {
         // Entity embedding
         if (strpos($src, 'embed:') === 0) {
-
             $embedParams = explode(':', $src);
+
             if (count($embedParams) < 3) {
                 return $src;
             }
@@ -139,12 +140,13 @@ class SwiftEmbedImages implements Swift_Events_SendListener
             $className = urldecode($embedParams[1]);
             $id = $embedParams[2];
 
-            if (!class_exists($className)) {
+            if (! class_exists($className)) {
                 return $src;
             }
 
             $class = new ReflectionClass($className);
-            if (! $class->implementsInterface(EmbeddableEntity::class) ) {
+
+            if (! $class->implementsInterface(EmbeddableEntity::class)) {
                 return $src;
             }
 
