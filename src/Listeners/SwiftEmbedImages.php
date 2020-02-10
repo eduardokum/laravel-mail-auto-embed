@@ -2,6 +2,8 @@
 
 namespace Eduardokum\LaravelMailAutoEmbed\Listeners;
 
+use DOMDocument;
+use DOMElement;
 use Eduardokum\LaravelMailAutoEmbed\Embedder\AttachmentEmbedder;
 use Eduardokum\LaravelMailAutoEmbed\Embedder\Base64Embedder;
 use Eduardokum\LaravelMailAutoEmbed\Embedder\Embedder;
@@ -51,49 +53,68 @@ class SwiftEmbedImages implements Swift_Events_SendListener
     }
 
     /**
-     *
+     * Attaches images by parsing the HTML document
      */
     private function attachImages()
     {
-        $html_body = $this->message->getBody();
+        // Get body
+        $body = $this->message->getBody();
 
-        $html_body = preg_replace_callback('/<img[^\0]*?src="(.*?)"\s?([^\0]*?)?>/', [$this, 'replaceCallback'], $html_body);
-
-        $this->message->setBody($html_body);
-    }
-
-    /**
-     * @param  array  $match
-     * @return string
-     */
-    private function replaceCallback($match)
-    {
-        $imageTag   = $match[0];
-        $src        = $match[1];
-        $attributes = $match[2];
-
-        if (!$this->needsEmbed($imageTag)) {
-            return $imageTag;
+        // Parse document
+        $document = new DOMDocument();
+        if (!$document->loadHTML($body)) {
+            // Cannot read
+            return;
         }
 
-        $embedder = $this->getEmbedder($imageTag);
+        // Add images
+        $this->attachImagesToDom($document);
 
-        return '<img src="'.$this->embed($embedder, $src).'" '.$attributes.'/>';
+        // Replace body
+        $this->message->setBody($document->saveHTML());
     }
 
     /**
-     * @param  string  $imageTag
+     * @param DOMDocument $document
+     * @return string
+     */
+    private function attachImagesToDom(&$document)
+    {
+        foreach ($document->getElementsByTagName('img') as $image) {
+            \assert($image instanceof DOMElement);
+
+            // Skip if embed is not required
+            if ($this->needsEmbed($image)) {
+                // Get proper embedder
+                $embedder = $this->getEmbedder($image);
+
+                // Update src
+                $image->setAttribute('src', $this->embed(
+                    $embedder,
+                    $image->getAttribute('src')
+                ));
+            }
+
+            // Remove data properties
+            $image->removeAttribute('data-skip-embed');
+            $image->removeAttribute('data-auto-embed');
+
+        }
+    }
+
+    /**
+     * @param DOMElement $imageTag
      * @return bool
      */
     private function needsEmbed($imageTag)
     {
         // Don't embed if 'data-skip-embed' is present
-        if (strpos($imageTag, 'data-skip-embed') !== false) {
+        if ($imageTag->hasAttribute('data-skip-embed')) {
             return false;
         }
 
         // Don't embed if auto-embed is disabled and 'data-auto-embed' is absent
-        if (!$this->config['enabled'] && strpos($imageTag, 'data-auto-embed') === false) {
+        if (!$this->config['enabled'] && !$imageTag->hasAttribute('data-auto-embed')) {
             return false;
         }
 
@@ -101,14 +122,15 @@ class SwiftEmbedImages implements Swift_Events_SendListener
     }
 
     /**
-     * @param  string  $imageTag
+     * @param  DOMElement  $imageTag
      * @return Embedder
      */
     private function getEmbedder($imageTag)
     {
-        $method = preg_match('/data-auto-embed=[\'"]?([^\'"]*)[\'"]?/', $imageTag, $matches)
-            ? $matches[1]
-            : $this->config['method'];
+        $method = $imageTag->getAttribute('data-auto-embed');
+        if (empty($method)) {
+            $method = $this->config['method'];
+        }
 
         switch ($method) {
 
