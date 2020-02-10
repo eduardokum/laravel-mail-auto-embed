@@ -8,7 +8,7 @@
 Automatically parses your messages and embeds the images found into your mail,
 replacing the original online-version of the image.
 
-Should work on Laravel 5.3+.
+Should work on Laravel 5.3+. Automatically tested for Laravel 5.4+ on PHP 7.0+.
 
 ## Install
 
