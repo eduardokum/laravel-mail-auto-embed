@@ -31,12 +31,13 @@ class MailTest extends TestCase
     }
 
     /**
-     * @param  string  $htmlMessage
+     * @param  string  $libraryFile
      * @param  array   $options
      * @return \Swift_Message
      */
-    private function handleBeforeSendPerformedEvent($htmlMessage, $options)
+    private function handleBeforeSendPerformedEvent($libraryFile, $options)
     {
+        $htmlMessage = $this->getLibraryFile($libraryFile);
         $message = $this->createSwiftMessage($htmlMessage);
 
         $embedPlugin = new SwiftEmbedImages($options);
@@ -48,143 +49,129 @@ class MailTest extends TestCase
     /**
      * @test
      */
-    public function images_are_automatically_embedded_when_enabled()
+    public function testAutomaticAttachmentConversion()
     {
-        $htmlMessage = <<<HTML
-<!-- url                --><img src="http://localhost/test.png" />
-<!-- url line break     --><img 
-                                src="http://localhost/test.png" 
-                            />
-<!--                    entity --><img src="embed:Eduardokum\\LaravelMailAutoEmbed\\Tests\\fixtures\\PictureEntity:1" />
-HTML;
+        $message = $this->handleBeforeSendPerformedEvent('embed-when-enabled.html', [
+            'enabled' => true,
+            'method' => 'attachment'
+        ]);
 
-        $message = $this->handleBeforeSendPerformedEvent($htmlMessage, ['enabled' => true, 'method' => 'attachment']);
-
-        $this->assertContains('<!-- url                --><img src="cid:',    $message->getBody());
-        $this->assertContains('<!-- url line break     --><img src="cid:',    $message->getBody());
-        $this->assertContains('<!--                    entity --><img src="cid:', $message->getBody());
+        $this->assertEmailImageTags([
+            'url' => 'cid:',
+            'entity' => 'cid:',
+        ], $message->getBody());
     }
 
     /**
      * @test
      */
-    public function image_embed_can_be_skipped()
+    public function testSkippedConversions()
     {
-        $htmlMessage = <<<HTML
-<!-- embed --><img src="http://localhost/test.png" />
-<!-- skip  --><img src="http://localhost/test.png" data-skip-embed />
-HTML;
+        $message = $this->handleBeforeSendPerformedEvent('embed-can-skip.html', [
+            'enabled' => true,
+            'method' => 'attachment'
+        ]);
 
-        $message = $this->handleBeforeSendPerformedEvent($htmlMessage, ['enabled' => true, 'method' => 'attachment']);
-
-        $this->assertContains('<!-- embed --><img src="cid:',                      $message->getBody());
-        $this->assertContains('<!-- skip  --><img src="http://localhost/test.png', $message->getBody());
+        $this->assertEmailImageTags([
+            'embed' => 'cid:',
+            'skip' => 'http://localhost/test.png',
+        ], $message->getBody());
     }
 
     /**
      * @test
      */
-    public function images_are_manually_embedded_when_disabled()
+    public function testManualConversions()
     {
-        $htmlMessage = <<<HTML
-<!-- ignore --><img src="http://localhost/test.png" />
-<!-- embed  --><img src="http://localhost/test.png" data-auto-embed />
-HTML;
+        $message = $this->handleBeforeSendPerformedEvent('manual-embed-when-disabled.html', [
+            'enabled' => false,
+            'method' => 'attachment'
+        ]);
 
-        $message = $this->handleBeforeSendPerformedEvent($htmlMessage, ['enabled' => false, 'method' => 'attachment']);
-
-        $this->assertContains('<!-- ignore --><img src="http://localhost/test.png', $message->getBody());
-        $this->assertContains('<!-- embed  --><img src="cid:',                      $message->getBody());
+        $this->assertEmailImageTags([
+            'ignore' => 'http://localhost/test.png',
+            'embed' => 'cid:',
+        ], $message->getBody());
     }
 
     /**
      * @test
      */
-    public function embed_type_can_be_overriden_to_base64()
+    public function testOverrideTypeBase64()
     {
-        $htmlMessage = <<<HTML
-<!-- attachment --><img src="http://localhost/test.png" />
-<!-- base64     --><img src="http://localhost/test.png" data-auto-embed="base64" />
-HTML;
+        $message = $this->handleBeforeSendPerformedEvent('override-to-base64.html', [
+            'enabled' => true,
+            'method' => 'attachment'
+        ]);
 
-        $message = $this->handleBeforeSendPerformedEvent($htmlMessage, ['enabled' => true, 'method' => 'attachment']);
-
-        $this->assertContains('<!-- attachment --><img src="cid:',                   $message->getBody());
-        $this->assertContains('<!-- base64     --><img src="data:image/png;base64,', $message->getBody());
+        $this->assertEmailImageTags([
+            'attachment' => 'cid:',
+            'base64' => 'data:image/png;base64,',
+        ], $message->getBody());
     }
 
     /**
      * @test
      */
-    public function embed_type_can_be_overriden_to_attachment()
+    public function testOverrideTypeAttachment()
     {
-        $htmlMessage = <<<HTML
-<!-- attachment --><img src="http://localhost/test.png" data-auto-embed="attachment" />
-<!-- base64     --><img src="http://localhost/test.png" />
-HTML;
+        $message = $this->handleBeforeSendPerformedEvent('override-to-attachment.html', [
+            'enabled' => true,
+            'method' => 'base64'
+        ]);
 
-        $message = $this->handleBeforeSendPerformedEvent($htmlMessage, ['enabled' => true, 'method' => 'base64']);
-
-        $this->assertContains('<!-- attachment --><img src="cid:',                   $message->getBody());
-        $this->assertContains('<!-- base64     --><img src="data:image/png;base64,', $message->getBody());
+        $this->assertEmailImageTags([
+            'attachment' => 'cid:',
+            'base64' => 'data:image/png;base64,',
+        ], $message->getBody());
     }
 
     /**
      * @test
      */
-    public function embed_fails_gracefully_with_attachments()
+    public function testGracefulFailureWithAttachments()
     {
-        $htmlMessage = <<<HTML
-<!-- host           --><img src="http://example.com/test.png" />
-<!-- image          --><img src="http://localhost/other.png" />
-<!-- source         --><img src="whatever" />
-<!-- syntax         --><img src="embed:whatever" />
-<!-- class          --><img src="embed:WrongEntityClassName:1" />
-<!-- implementation --><img src="embed:Eduardokum\\LaravelMailAutoEmbed\\Tests\\fixtures\\WrongEntity:1" />
-<!-- not found      --><img src="embed:Eduardokum\\LaravelMailAutoEmbed\\Tests\\fixtures\\PictureEntity:9" />
-HTML;
+        $message = $this->handleBeforeSendPerformedEvent('graceful-fails.html', [
+            'enabled' => true,
+            'method' => 'attachment'
+        ]);
 
-        $message = $this->handleBeforeSendPerformedEvent($htmlMessage, ['enabled' => true, 'method' => 'attachment']);
-
-        $this->assertContains('<!-- host           --><img src="http://example.com/test.png',                                              $message->getBody());
-        $this->assertContains('<!-- image          --><img src="http://localhost/other.png',                                               $message->getBody());
-        $this->assertContains('<!-- source         --><img src="whatever',                                                                 $message->getBody());
-        $this->assertContains('<!-- syntax         --><img src="embed:whatever',                                                           $message->getBody());
-        $this->assertContains('<!-- class          --><img src="embed:WrongEntityClassName:1',                                             $message->getBody());
-        $this->assertContains('<!-- implementation --><img src="embed:Eduardokum\\LaravelMailAutoEmbed\\Tests\\fixtures\\WrongEntity:1',   $message->getBody());
-        $this->assertContains('<!-- not found      --><img src="embed:Eduardokum\\LaravelMailAutoEmbed\\Tests\\fixtures\\PictureEntity:9', $message->getBody());
+        $this->assertEmailImageTags([
+            'host' => 'http://example.com/test.png',
+            'image' => 'http://localhost/other.png',
+            'source' => 'whatever',
+            'syntax' => 'embed:whatever',
+            'class' => 'embed:WrongEntityClassName:1',
+            'implementation' => 'embed:Eduardokum\\LaravelMailAutoEmbed\\Tests\\fixtures\\WrongEntity:1',
+            'not found' => 'embed:Eduardokum\\LaravelMailAutoEmbed\\Tests\\fixtures\\PictureEntity:9',
+        ], $message->getBody());
     }
 
     /**
      * @test
      */
-    public function embed_fails_gracefully_with_base64()
+    public function testGracefulFailureWithBase64()
     {
-        $htmlMessage = <<<HTML
-<!-- host           --><img src="http://example.com/test.png" />
-<!-- image          --><img src="http://localhost/other.png" />
-<!-- source         --><img src="whatever" />
-<!-- syntax         --><img src="embed:whatever" />
-<!-- class          --><img src="embed:WrongEntityClassName:1" />
-<!-- implementation --><img src="embed:Eduardokum\\LaravelMailAutoEmbed\\Tests\\fixtures\\WrongEntity:1" />
-<!-- not found      --><img src="embed:Eduardokum\\LaravelMailAutoEmbed\\Tests\\fixtures\\PictureEntity:9" />
-HTML;
+        $message = $this->handleBeforeSendPerformedEvent('graceful-fails.html', [
+            'enabled' => true,
+            'method' => 'base64'
+        ]);
 
-        $message = $this->handleBeforeSendPerformedEvent($htmlMessage, ['enabled' => true, 'method' => 'base64']);
-
-        $this->assertContains('<!-- host           --><img src="http://example.com/test.png',                                              $message->getBody());
-        $this->assertContains('<!-- image          --><img src="http://localhost/other.png',                                               $message->getBody());
-        $this->assertContains('<!-- source         --><img src="whatever',                                                                 $message->getBody());
-        $this->assertContains('<!-- syntax         --><img src="embed:whatever',                                                           $message->getBody());
-        $this->assertContains('<!-- class          --><img src="embed:WrongEntityClassName:1',                                             $message->getBody());
-        $this->assertContains('<!-- implementation --><img src="embed:Eduardokum\\LaravelMailAutoEmbed\\Tests\\fixtures\\WrongEntity:1',   $message->getBody());
-        $this->assertContains('<!-- not found      --><img src="embed:Eduardokum\\LaravelMailAutoEmbed\\Tests\\fixtures\\PictureEntity:9', $message->getBody());
+        $this->assertEmailImageTags([
+            'host' => 'http://example.com/test.png',
+            'image' => 'http://localhost/other.png',
+            'source' => 'whatever',
+            'syntax' => 'embed:whatever',
+            'class' => 'embed:WrongEntityClassName:1',
+            'implementation' => 'embed:Eduardokum\\LaravelMailAutoEmbed\\Tests\\fixtures\\WrongEntity:1',
+            'not found' => 'embed:Eduardokum\\LaravelMailAutoEmbed\\Tests\\fixtures\\PictureEntity:9',
+        ], $message->getBody());
     }
 
     /**
      * @test
      */
-    public function doesnt_handle_sendPerformed_event()
+    public function testDoesntHandleSendPerformedEvent()
     {
         $message = $this->createSwiftMessage('<h1>Test</h1>');
 
@@ -193,5 +180,29 @@ HTML;
         $this->assertTrue(
             $embedPlugin->sendPerformed($this->createSwiftEvent($message))
         );
+    }
+
+    /**
+     * Check the body for image tags with the given keys as comment preceding them.
+     * @param array $expectations
+     * @param string $body
+     * @return void
+     */
+    protected function assertEmailImageTags($expectations, $body)
+    {
+        foreach ($expectations as $comment => $src) {
+            // Gimmick of using a DOMDocument parser
+            $src = str_replace('\\', '%5C', \htmlspecialchars($src));
+
+            // Fix for PHPUnit <8.0
+            // phpcs:ignore Generic.Files.LineLength.TooLong
+            $method = \method_exists($this, 'assertStringContainsString') ? 'assertStringContainsString' : 'assertContains';
+
+            // Check if the string is contained within the string
+            $this->$method(
+                sprintf('<!-- %s --><img src="%s', $comment, $src),
+                $body
+            );
+        }
     }
 }

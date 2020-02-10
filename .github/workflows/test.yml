@@ -1,0 +1,72 @@
+name: "Run unit tests"
+
+on:
+  - push
+  - pull_request
+
+env:
+  COMPOSER_MEMORY_LIMIT: -1
+
+jobs:
+  test:
+    name: "Build"
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 12
+      fail-fast: false
+      matrix:
+        php: ['7.1', '7.2', '7.3', '7.4', '8.0']
+        laravel: ['5.4', '5.5', '5.6', '5.7', '5.8', '6.x']
+        exclude:
+          # PHP 7.0
+          - php: '7.0'
+            laravel: '5.6'
+          - php: '7.0'
+            laravel: '5.7'
+          - php: '7.0'
+            laravel: '5.8'
+          - php: '7.0'
+            laravel: '6.x'
+          # PHP 7.1
+          - php: '7.1'
+            laravel: '6.x'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Setup PHP ${{ matrix.php }}
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: exif,json,mbstring,dom
+
+      - name: Get user-level Composer cache
+        id: composer-cache
+        run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+
+      - name: Setup Composer cache
+        uses: actions/cache@v1
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: composer-${{ runner.os }}-${{ matrix.php }}-${{ matrix.laravel }}-${{ hashFiles('**/composer.json') }}
+          restore-keys: |
+            composer-${{ runner.os }}-${{ matrix.php }}-${{ matrix.laravel }}-${{ env.cache-name }}-
+            composer-${{ runner.os }}-${{ matrix.php }}-${{ matrix.laravel }}-
+            composer-${{ runner.os }}-${{ matrix.php }}-
+            composer-${{ runner.os }}-
+
+      - name: Select Laravel ${{ matrix.laravel }}
+        run: tests/bin/laravel-version ${{ matrix.laravel }}
+
+      - name: Pretend to be PHP 7.4
+        if: matrix.php == '8.0'
+        run: composer config platform.php 7.4.2
+
+      - name: Install composer dependencies
+        run: composer update --no-suggest --no-progress --no-interaction
+
+      - name: Run linters
+        run: composer run lint
+
+      - name: Run unit tests
+        run: composer run test

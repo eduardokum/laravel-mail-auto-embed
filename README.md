@@ -5,16 +5,21 @@
 
 # Laravel Mail Auto Embed
 
+Automatically parses your messages and embeds the images found into your mail,
+replacing the original online-version of the image.
+
+Should work on Laravel 5.3+. Automatically tested for Laravel 5.4+ on PHP 7.0+.
 
 ## Install
 
 You can install the package via composer:
-```bash
-$ composer require eduardokum/laravel-mail-auto-embed
+```shell
+composer require eduardokum/laravel-mail-auto-embed
 ```
 
-This package uses Laravel 5.5 Package Auto-Discovery.<br>
-For previous versions of Laravel, you need to add the following Service Provider:
+This package uses Laravel 5.5 Package Auto-Discovery.
+For previous versions of Laravel, you need to add the following Service
+Provider:
 
 ```php
 $providers = [
@@ -29,7 +34,8 @@ $providers = [
 
 Its use is very simple, you write your markdown normally:
 
-```
+```markdown
+<!-- eg: resources/vendor/mail/markdown/order-shipped.blade.php -->
 @component('mail::message')
 # Order Shipped
 
@@ -49,15 +55,15 @@ Thanks,<br>
 ```
 
 When sending, it will replace the link that would normally be generated:
-> `<img src="https://domain.com/products/product-1.png">` 
+> `<img src="https://domain.com/products/product-1.png">`
 
 by an embedded inline attachment of the image:
 > `<img src="cid:3991f143cf1a86257f8671883736613c@Swift.generated">`.
 
-It also works for raw html too:
+It works for raw html too:
 
 ```html
-// eg: resources/vendor/mail/html/header.blade.php
+<!-- eg: resources/vendor/mail/html/header.blade.php -->
 <tr>
     <td class="header">
         <a href="{{ $url }}">
@@ -67,7 +73,8 @@ It also works for raw html too:
 </tr>
 ```
 
-If you do not want to use automatic embedding for specific images (because they are hosted elsewhere, if you want to use some kind of image tracker, etc.) 
+If you do not want to use automatic embedding for specific images (because they
+are hosted elsewhere, if you want to use some kind of image tracker, etc.),
 simply add the attribute `data-skip-embed` in the image tag:
 
 ```html
@@ -75,7 +82,7 @@ simply add the attribute `data-skip-embed` in the image tag:
 ```
 ### Local resources
 
-For local resources that are not available publicly, use `file://` urls, example
+For local resources that are not available publicly, use `file://` urls:
 
 ```html
 <img src="file://{{ resource_path('assets/img/logo.png') }}" alt="Logo" border="0"/>
@@ -83,7 +90,8 @@ For local resources that are not available publicly, use `file://` urls, example
 
 ## Configuration
 
-The defaults are set in `config/mail-auto-embed.php`. You can copy this file to your own config directory to modify the values using this command:
+The defaults are set in `config/mail-auto-embed.php`. You can copy this file to
+your own config directory to modify the values using this command:
 
 ```shell
 php artisan vendor:publish --provider="Eduardokum\LaravelMailAutoEmbed\ServiceProvider"
@@ -91,14 +99,34 @@ php artisan vendor:publish --provider="Eduardokum\LaravelMailAutoEmbed\ServicePr
 
 ### Explicit embedding configuration
 
-By default, images are embedded automatically, unless you add the `data-skip-embed` attribute.
+By default, images are embedded automatically, unless you add the
+`data-skip-embed` attribute.
 
-You can also disable auto-embedding globally by setting the `MAIL_AUTO_EMBED` environment variable to `false`.
-You can then enable embedding for specific images with the `data-auto-embed` attribute.
+You can also disable auto-embedding globally by setting the `MAIL_AUTO_EMBED`
+environment variable to `false`, or by modifying the `enabled` property in the
+published config. You can then enable embedding for individual images with the
+`data-auto-embed` attribute.
 
-```
+```env
 # .env
 MAIL_AUTO_EMBED=false
+```
+
+```php
+return [
+    /*
+    |--------------------------------------------------------------------------
+    | Mail auto embed
+    |--------------------------------------------------------------------------
+    |
+    | If true, images will be automatically embedded.
+    | If false, only images with the 'data-auto-embed' attribute will be embedded
+    |
+    */
+    'enabled' => false,
+
+    // …
+];
 ```
 
 ```html
@@ -114,14 +142,33 @@ MAIL_AUTO_EMBED=false
 
 ### Base64 embedding
 
-If you prefer to use Base64 instead of inline attachments, you can do so by setting the `MAIL_AUTO_EMBED_METHOD` environment variable to `base64`. 
+If you prefer to use Base64 instead of inline attachments, you can do so by
+setting the `MAIL_AUTO_EMBED_METHOD` environment variable or the `method`
+config property to `base64`.
 
-Note that it will increase the e-mail size, and that it won't be decoded by some e-mail clients such as Gmail.
+```php
+return [
+    // …
 
+    /*
+    |--------------------------------------------------------------------------
+    | Mail embed method
+    |--------------------------------------------------------------------------
+    |
+    | Supported: "attachment", "base64"
+    |
+    */
+    'method' => 'base64',
+];
+```
+
+Note that it will increase the e-mail size, and that it won't be decoded by
+some e-mail clients such as Gmail.
 
 ## Mixed embedding methods
 
-If you want to use both inline attachment and Base64 depending on the image, you can specify the embedding method as the `data-auto-embed` attribute value:   
+If you want to use both inline attachment and Base64 depending on the image,
+you can specify the embedding method as the `data-auto-embed` attribute value:
 
 ```html
 <p>
@@ -135,9 +182,11 @@ If you want to use both inline attachment and Base64 depending on the image, you
 
 ## Embedding entities
 
-You might want to embed images that don't actually exist in your filesystem (stored in the database).
+You might want to embed images that don't actually exist in your filesystem
+(stored in the database).
 
-In that case, make the entities you want to embed implement the `EmbeddableEntity` interface:
+In that case, make the entities you want to embed implement the
+`EmbeddableEntity` interface:
 
 ```php
 namespace App\Models;
@@ -192,9 +241,11 @@ Then, you can use the `embed:ClassName:id` syntax in your e-mail template:
 
 
 ## Contributing
-Please feel free to submit pull requests if you can improve or add any features.
+Please feel free to submit pull requests if you can improve or add any
+features.
 
-We are currently using PSR-2. This is easy to implement and check with the PHP Coding Standards Fixer.
+We are currently using PSR-2. This is easy to implement and check with the PHP
+Coding Standards Fixer.
 
 <a target="_blank" href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=QPDFT3UXS6PTL&lc=GB&item_name=laravel%2dmail%2dauto%2dembed&item_number=laravel%2dmail%2dauto%2dembed&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted">
         <img alt="Donate with Paypal" src="https://www.paypalobjects.com/en_US/GB/i/btn/btn_donateCC_LG.gif"/></a>

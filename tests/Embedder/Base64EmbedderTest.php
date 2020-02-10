@@ -8,17 +8,19 @@ use Eduardokum\LaravelMailAutoEmbed\Tests\TestCase;
 
 class Base64EmbedderTest extends TestCase
 {
-    protected function setUp()
+    /**
+     * @before
+     * @return void
+     */
+    protected function setUpEmbedder(): void
     {
-        parent::setUp();
-
         $this->embedder = new Base64Embedder();
     }
 
     /**
      * @test
      */
-    public function encodes_local_files_to_base64()
+    public function testLocalConversion()
     {
         $embedder = new Base64Embedder();
 
@@ -30,7 +32,7 @@ class Base64EmbedderTest extends TestCase
     /**
      * @test
      */
-    public function encodes_entities_to_base64()
+    public function testEntityConversion()
     {
         $embedder = new Base64Embedder();
 

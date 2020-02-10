@@ -16,10 +16,12 @@ class AttachmentEmbedderTest extends TestCase
     /** @var  AttachmentEmbedder */
     private $embedder;
 
-    protected function setUp()
+    /**
+     * @before
+     * @return void
+     */
+    protected function setUpEmbedder()
     {
-        parent::setUp();
-
         $this->message = new Swift_Message();
         $this->embedder = new AttachmentEmbedder($this->message);
     }
@@ -41,7 +43,7 @@ class AttachmentEmbedderTest extends TestCase
     /**
      * @test
      */
-    public function encodes_local_files_to_base64()
+    public function testLocalConversion()
     {
         $result = $this->embedder->fromUrl('http://localhost/test.png');
 
@@ -53,7 +55,7 @@ class AttachmentEmbedderTest extends TestCase
     /**
      * @test
      */
-    public function encodes_entities_to_base64()
+    public function testEntityConversion()
     {
         $picture = new PictureEntity();
 
