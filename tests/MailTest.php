@@ -195,6 +195,7 @@ class MailTest extends TestCase
             $src = str_replace('\\', '%5C', \htmlspecialchars($src));
 
             // Fix for PHPUnit <8.0
+            // phpcs:ignore Generic.Files.LineLength.TooLong
             $method = \method_exists($this, 'assertStringContainsString') ? 'assertStringContainsString' : 'assertContains';
 
             // Check if the string is contained within the string

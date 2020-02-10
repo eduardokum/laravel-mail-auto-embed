@@ -98,7 +98,6 @@ class SwiftEmbedImages implements Swift_Events_SendListener
             // Remove data properties
             $image->removeAttribute('data-skip-embed');
             $image->removeAttribute('data-auto-embed');
-
         }
     }
 
@@ -133,7 +132,6 @@ class SwiftEmbedImages implements Swift_Events_SendListener
         }
 
         switch ($method) {
-
             case 'attachment':
             default:
                 return new AttachmentEmbedder($this->message);
@@ -152,7 +150,6 @@ class SwiftEmbedImages implements Swift_Events_SendListener
     {
         // Entity embedding
         if (strpos($src, 'embed:') === 0) {
-
             $embedParams = explode(':', $src);
             if (count($embedParams) < 3) {
                 return $src;
@@ -166,7 +163,7 @@ class SwiftEmbedImages implements Swift_Events_SendListener
             }
 
             $class = new ReflectionClass($className);
-            if (! $class->implementsInterface(EmbeddableEntity::class) ) {
+            if (! $class->implementsInterface(EmbeddableEntity::class)) {
                 return $src;
             }
 
