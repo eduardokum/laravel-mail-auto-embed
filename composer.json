@@ -18,7 +18,8 @@
         "ext-dom": "*",
         "illuminate/contracts": "^5.3 | ^6.0",
         "illuminate/support": "^5.3 | ^6.0",
-        "illuminate/mail": "^5.3 | ^6.0"
+        "illuminate/mail": "^5.3 | ^6.0",
+        "squizlabs/php_codesniffer": "^3.5"
     },
     "require-dev": {
         "php": ">=7.0",
@@ -41,5 +42,9 @@
                 "Eduardokum\\LaravelMailAutoEmbed\\ServiceProvider"
             ]
         }
+    },
+    "scripts": {
+        "test": "phpunit",
+        "lint": "phpcs"
     }
 }
