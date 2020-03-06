@@ -58,9 +58,6 @@ trait InteractsWithSwift
     protected function assertEmailImageTags($expectations, $body)
     {
         foreach ($expectations as $comment => $src) {
-            // Gimmick of using a DOMDocument parser
-            $src = str_replace('\\', '%5C', \htmlspecialchars($src));
-
             // Fix for PHPUnit <8.0
             // phpcs:ignore Generic.Files.LineLength.TooLong
             $method = \method_exists($this, 'assertStringContainsString') ? 'assertStringContainsString' : 'assertContains';

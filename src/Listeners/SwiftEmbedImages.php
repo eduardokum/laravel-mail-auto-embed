@@ -8,6 +8,7 @@ use Eduardokum\LaravelMailAutoEmbed\Embedder\AttachmentEmbedder;
 use Eduardokum\LaravelMailAutoEmbed\Embedder\Base64Embedder;
 use Eduardokum\LaravelMailAutoEmbed\Embedder\Embedder;
 use Eduardokum\LaravelMailAutoEmbed\Models\EmbeddableEntity;
+use Masterminds\HTML5;
 use ReflectionClass;
 use Swift_Events_SendEvent;
 use Swift_Events_SendListener;
@@ -61,8 +62,9 @@ class SwiftEmbedImages implements Swift_Events_SendListener
         $body = $this->message->getBody();
 
         // Parse document
-        $document = new DOMDocument();
-        if (!$document->loadHTML($body)) {
+        $parser = new HTML5();
+        $document = $parser->loadHTML($body);
+        if (!$document) {
             // Cannot read
             return;
         }
@@ -71,7 +73,7 @@ class SwiftEmbedImages implements Swift_Events_SendListener
         $this->attachImagesToDom($document);
 
         // Replace body
-        $this->message->setBody($document->saveHTML());
+        $this->message->setBody($parser->saveHTML($document));
     }
 
     /**
