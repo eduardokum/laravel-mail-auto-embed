@@ -3,6 +3,7 @@
 namespace Eduardokum\LaravelMailAutoEmbed\Embedder;
 
 use Eduardokum\LaravelMailAutoEmbed\Models\EmbeddableEntity;
+use Illuminate\Support\Str;
 
 class Base64Embedder extends Embedder
 {
@@ -12,14 +13,26 @@ class Base64Embedder extends Embedder
      */
     public function fromUrl($url)
     {
-        $filePath = str_replace(url('/'), public_path('/'), $url);
+        $localFile = str_replace(url('/'), public_path('/'), $url);
 
-        if (!file_exists($filePath)) {
-            return $url;
+        if (file_exists($localFile)) {
+            return $this->fromPath($localFile);
         }
 
-        return $this->base64String(mime_content_type($filePath), file_get_contents($filePath));
+        if ($embeddedFromRemoteUrl = $this->fromRemoteUrl($url)) {
+            return $embeddedFromRemoteUrl;
+        }
+        return $url;
     }
+
+    public function fromPath($path)
+    {
+        if (file_exists($path)) {
+            return $this->base64String(mime_content_type($path), file_get_contents($path));
+        }
+        return $path;
+    }
+
 
     /**
      * @param  EmbeddableEntity  $entity
@@ -37,5 +50,32 @@ class Base64Embedder extends Embedder
     private function base64String($mimeType, $content)
     {
         return 'data:'.$mimeType.';base64,'.base64_encode($content);
+    }
+
+    /**
+     * @param  string  $url
+     */
+    public function fromRemoteUrl($url)
+    {
+        if (filter_var($url, FILTER_VALIDATE_URL)) {
+            $ch = curl_init($url);
+            curl_setopt($ch, CURLOPT_HEADER, 0);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+            curl_setopt($ch, CURLOPT_BINARYTRANSFER, 1);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+            $raw = curl_exec($ch);
+            $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            $contentType = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
+            curl_close($ch);
+
+            if ($httpcode == 200) {
+                return $this->embed(
+                    new Swift_Image($raw, Str::random(10), $contentType)
+                );
+            }
+        }
+
+        return null;
     }
 }

@@ -25,12 +25,16 @@ class AttachmentEmbedder extends Embedder
     }
 
     /**
-     * @param string $url
-     *
-     * @return string|null
+     * @param  string  $url
      */
     public function fromUrl($url)
     {
+        $localFile = str_replace(url('/'), public_path('/'), $url);
+
+        if (file_exists($localFile)) {
+            return $this->fromPath($localFile);
+        }
+
         if ($embeddedFromRemoteUrl = $this->fromRemoteUrl($url)) {
             return $embeddedFromRemoteUrl;
         }
@@ -39,43 +43,12 @@ class AttachmentEmbedder extends Embedder
 
     public function fromPath($path)
     {
-        if (!file_exists($path)) {
-            return $path;
+        if (file_exists($path)) {
+            return $this->embed(
+                Swift_Image::fromPath($path)
+            );
         }
-
-        return $this->embed(
-            Swift_Image::fromPath($path)
-        );
-    }
-
-
-    /**
-     * @param string $url
-     *
-     * @return string|null
-     */
-    public function fromRemoteUrl($url)
-    {
-        if (filter_var($url, FILTER_VALIDATE_URL)) {
-            $ch = curl_init($url);
-            curl_setopt($ch, CURLOPT_HEADER, 0);
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-            curl_setopt($ch, CURLOPT_BINARYTRANSFER, 1);
-            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-            $raw = curl_exec($ch);
-            $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-            $contentType = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
-            curl_close($ch);
-
-            if ($httpcode == 200) {
-                return $this->embed(
-                    new Swift_Image($raw, Str::random(10), $contentType)
-                );
-            }
-        }
-
-        return null;
+        return $path;
     }
 
     /**
@@ -99,5 +72,32 @@ class AttachmentEmbedder extends Embedder
     protected function embed(Swift_EmbeddedFile $attachment)
     {
         return $this->message->embed($attachment);
+    }
+
+    /**
+     * @param  string  $url
+     */
+    public function fromRemoteUrl($url)
+    {
+        if (filter_var($url, FILTER_VALIDATE_URL)) {
+            $ch = curl_init($url);
+            curl_setopt($ch, CURLOPT_HEADER, 0);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+            curl_setopt($ch, CURLOPT_BINARYTRANSFER, 1);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+            $raw = curl_exec($ch);
+            $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            $contentType = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
+            curl_close($ch);
+
+            if ($httpcode == 200) {
+                return $this->embed(
+                    new Swift_Image($raw, Str::random(10), $contentType)
+                );
+            }
+        }
+
+        return null;
     }
 }
