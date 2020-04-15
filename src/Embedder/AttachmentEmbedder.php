@@ -25,26 +25,34 @@ class AttachmentEmbedder extends Embedder
     }
 
     /**
-     * @param  string  $url
+     * @param string $url
+     *
+     * @return string|null
      */
     public function fromUrl($url)
     {
-        $filePath = str_replace(url('/'), public_path('/'), $url);
+        if ($embeddedFromRemoteUrl = $this->fromRemoteUrl($url)) {
+            return $embeddedFromRemoteUrl;
+        }
+        return $url;
+    }
 
-        if (!file_exists($filePath)) {
-            if ($embeddedFromRemoteUrl = $this->fromRemoteUrl($filePath)) {
-                return $embeddedFromRemoteUrl;
-            }
-            return $url;
+    public function fromPath($path)
+    {
+        if (!file_exists($path)) {
+            return $path;
         }
 
         return $this->embed(
-            Swift_Image::fromPath($filePath)
+            Swift_Image::fromPath($path)
         );
     }
 
+
     /**
-     * @param  string  $url
+     * @param string $url
+     *
+     * @return string|null
      */
     public function fromRemoteUrl($url)
     {

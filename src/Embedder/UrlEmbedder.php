@@ -9,4 +9,10 @@ interface UrlEmbedder
      * @return string
      */
     public function fromUrl($url);
+
+    /**
+     * @param  string  $path
+     * @return string
+     */
+    public function fromPath($path);
 }
