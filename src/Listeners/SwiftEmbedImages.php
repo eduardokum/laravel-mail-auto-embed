@@ -183,11 +183,19 @@ class SwiftEmbedImages implements Swift_Events_SendListener
         }
 
         // Path embedding
-        $changedSrc = str_replace(url('/'), public_path('/'), $src);
+        $publicPath = public_path($src);
+        $appPath = app_path($src);
+        $storagePath = storage_path($src);
         if (file_exists($src)) {
             return $embedder->fromPath($src);
-        } elseif(file_exists($changedSrc)) {
-            return $embedder->fromPath($changedSrc);
+        }
+        // Try to guess where the file is at that priority level
+        elseif(file_exists($publicPath)) {
+            return $embedder->fromPath($publicPath);
+        } elseif(file_exists($appPath)) {
+            return $embedder->fromPath($appPath);
+        } elseif(file_exists($storagePath)) {
+            return $embedder->fromPath($storagePath);
         }
 
         return $src;

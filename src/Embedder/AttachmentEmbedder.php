@@ -30,7 +30,6 @@ class AttachmentEmbedder extends Embedder
     public function fromUrl($url)
     {
         $localFile = str_replace(url('/'), public_path('/'), $url);
-
         if (file_exists($localFile)) {
             return $this->fromPath($localFile);
         }
