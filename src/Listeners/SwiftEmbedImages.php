@@ -115,7 +115,7 @@ class SwiftEmbedImages implements Swift_Events_SendListener
         }
 
         // Don't embed if auto-embed is disabled and 'data-auto-embed' is absent
-        if (!$this->config['enabled'] && !$imageTag->hasAttribute('data-auto-embed')) {
+        if (!is_null($this->config) && !$this->config['enabled'] && !$imageTag->hasAttribute('data-auto-embed')) {
             return false;
         }
 
@@ -130,7 +130,7 @@ class SwiftEmbedImages implements Swift_Events_SendListener
     {
         $method = $imageTag->getAttribute('data-auto-embed');
         if (empty($method)) {
-            $method = $this->config['method'];
+            $method = is_null($this->config) ? '' : $this->config['method'];
         }
 
         switch ($method) {
@@ -180,22 +180,6 @@ class SwiftEmbedImages implements Swift_Events_SendListener
         // URL embedding
         if (filter_var($src, FILTER_VALIDATE_URL) !== false) {
             return $embedder->fromUrl($src);
-        }
-
-        // Path embedding
-        $publicPath = public_path($src);
-        $appPath = app_path($src);
-        $storagePath = storage_path($src);
-        if (file_exists($src)) {
-            return $embedder->fromPath($src);
-        }
-        // Try to guess where the file is at that priority level
-        elseif(file_exists($publicPath)) {
-            return $embedder->fromPath($publicPath);
-        } elseif(file_exists($appPath)) {
-            return $embedder->fromPath($appPath);
-        } elseif(file_exists($storagePath)) {
-            return $embedder->fromPath($storagePath);
         }
 
         return $src;
