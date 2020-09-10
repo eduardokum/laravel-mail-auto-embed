@@ -16,7 +16,7 @@ jobs:
       fail-fast: false
       matrix:
         php: ['7.1', '7.2', '7.3', '7.4', '8.0']
-        laravel: ['5.4', '5.5', '5.6', '5.7', '5.8', '6.x']
+        laravel: ['5.4', '5.5', '5.6', '5.7', '5.8', '6.x', '7.x', '8.x']
         exclude:
           # PHP 7.0
           - php: '7.0'
@@ -27,9 +27,20 @@ jobs:
             laravel: '5.8'
           - php: '7.0'
             laravel: '6.x'
+          - php: '7.0'
+            laravel: '7.x'
+          - php: '7.0'
+            laravel: '8.x'
           # PHP 7.1
           - php: '7.1'
             laravel: '6.x'
+          - php: '7.1'
+            laravel: '7.x'
+          - php: '7.1'
+            laravel: '8.x'
+          # PHP 7.2
+          - php: '7.2'
+            laravel: '8.x'
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
