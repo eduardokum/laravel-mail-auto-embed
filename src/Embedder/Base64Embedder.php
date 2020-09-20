@@ -21,6 +21,7 @@ class Base64Embedder extends Embedder
         if ($embeddedFromRemoteUrl = $this->fromRemoteUrl($url)) {
             return $embeddedFromRemoteUrl;
         }
+
         return $url;
     }
 
@@ -29,9 +30,9 @@ class Base64Embedder extends Embedder
         if (file_exists($path)) {
             return $this->base64String(mime_content_type($path), file_get_contents($path));
         }
+
         return $path;
     }
-
 
     /**
      * @param  EmbeddableEntity  $entity

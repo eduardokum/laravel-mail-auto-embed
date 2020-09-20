@@ -10,10 +10,10 @@ use Swift_Message;
 
 class AttachmentEmbedderTest extends TestCase
 {
-    /** @var  Swift_Message */
+    /** @var Swift_Message */
     private $message;
 
-    /** @var  AttachmentEmbedder */
+    /** @var AttachmentEmbedder */
     private $embedder;
 
     /**

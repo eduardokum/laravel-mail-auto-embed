@@ -16,7 +16,7 @@ class MailTest extends TestCase
     {
         $message = $this->handleBeforeSendPerformedEvent('embed-when-enabled.html', [
             'enabled' => true,
-            'method' => 'attachment'
+            'method' => 'attachment',
         ]);
 
         $this->assertEmailImageTags([
@@ -32,7 +32,7 @@ class MailTest extends TestCase
     {
         $message = $this->handleBeforeSendPerformedEvent('embed-can-skip.html', [
             'enabled' => true,
-            'method' => 'attachment'
+            'method' => 'attachment',
         ]);
 
         $this->assertEmailImageTags([
@@ -48,7 +48,7 @@ class MailTest extends TestCase
     {
         $message = $this->handleBeforeSendPerformedEvent('manual-embed-when-disabled.html', [
             'enabled' => false,
-            'method' => 'attachment'
+            'method' => 'attachment',
         ]);
 
         $this->assertEmailImageTags([
@@ -64,7 +64,7 @@ class MailTest extends TestCase
     {
         $message = $this->handleBeforeSendPerformedEvent('override-to-base64.html', [
             'enabled' => true,
-            'method' => 'attachment'
+            'method' => 'attachment',
         ]);
 
         $this->assertEmailImageTags([
@@ -80,7 +80,7 @@ class MailTest extends TestCase
     {
         $message = $this->handleBeforeSendPerformedEvent('override-to-attachment.html', [
             'enabled' => true,
-            'method' => 'base64'
+            'method' => 'base64',
         ]);
 
         $this->assertEmailImageTags([
@@ -96,7 +96,7 @@ class MailTest extends TestCase
     {
         $message = $this->handleBeforeSendPerformedEvent('graceful-fails.html', [
             'enabled' => true,
-            'method' => 'attachment'
+            'method' => 'attachment',
         ]);
 
         $this->assertEmailImageTags([
@@ -117,7 +117,7 @@ class MailTest extends TestCase
     {
         $message = $this->handleBeforeSendPerformedEvent('graceful-fails.html', [
             'enabled' => true,
-            'method' => 'base64'
+            'method' => 'base64',
         ]);
 
         $this->assertEmailImageTags([

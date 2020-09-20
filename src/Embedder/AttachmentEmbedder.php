@@ -2,11 +2,11 @@
 
 namespace Eduardokum\LaravelMailAutoEmbed\Embedder;
 
+use Eduardokum\LaravelMailAutoEmbed\Models\EmbeddableEntity;
 use Illuminate\Support\Str;
+use Swift_EmbeddedFile;
 use Swift_Image;
 use Swift_Message;
-use Swift_EmbeddedFile;
-use Eduardokum\LaravelMailAutoEmbed\Models\EmbeddableEntity;
 
 class AttachmentEmbedder extends Embedder
 {
@@ -37,6 +37,7 @@ class AttachmentEmbedder extends Embedder
         if ($embeddedFromRemoteUrl = $this->fromRemoteUrl($url)) {
             return $embeddedFromRemoteUrl;
         }
+
         return $url;
     }
 
@@ -47,6 +48,7 @@ class AttachmentEmbedder extends Embedder
                 Swift_Image::fromPath($path)
             );
         }
+
         return $path;
     }
 

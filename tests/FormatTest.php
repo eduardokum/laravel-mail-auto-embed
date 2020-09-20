@@ -7,14 +7,14 @@ use Eduardokum\LaravelMailAutoEmbed\Tests\Traits\InteractsWithSwift;
 
 /**
  * Tests some scenarios, like HTML5 mails and mail with "invalid" HTML that mail clients
- * like
+ * like.
  */
 class FormatTest extends TestCase
 {
     use InteractsWithSwift;
     private const HANDLE_CONFIG = [
         'enabled' => true,
-        'method' => 'attachment'
+        'method' => 'attachment',
     ];
 
     /**
