@@ -23,6 +23,7 @@ class Base64Embedder extends Embedder
         if ($embeddedFromRemoteUrl = $this->fromRemoteUrl($url)) {
             return $embeddedFromRemoteUrl;
         }
+
         return $url;
     }
 
@@ -31,9 +32,9 @@ class Base64Embedder extends Embedder
         if (file_exists($path)) {
             return $this->base64String(mime_content_type($path), file_get_contents($path));
         }
+
         return $path;
     }
-
 
     /**
      * @param  EmbeddableEntity  $entity
@@ -54,15 +55,6 @@ class Base64Embedder extends Embedder
     }
 
     /**
-     * @param  Swift_EmbeddedFile  $attachment
-     * @return string
-     */
-    protected function embed(Swift_EmbeddedFile $attachment)
-    {
-        return $this->message->embed($attachment);
-    }
-
-    /**
      * @param  string  $url
      */
     public function fromRemoteUrl($url)
@@ -80,12 +72,8 @@ class Base64Embedder extends Embedder
             curl_close($ch);
 
             if ($httpcode == 200) {
-                return $this->embed(
-                    new Swift_Image($raw, Str::random(10), $contentType)
-                );
+                return $this->base64String($contentType, $raw);
             }
         }
-
-        return null;
     }
 }
