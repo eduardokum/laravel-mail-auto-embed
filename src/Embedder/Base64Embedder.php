@@ -4,6 +4,8 @@ namespace Eduardokum\LaravelMailAutoEmbed\Embedder;
 
 use Eduardokum\LaravelMailAutoEmbed\Models\EmbeddableEntity;
 use Illuminate\Support\Str;
+use Swift_EmbeddedFile;
+use Swift_Image;
 
 class Base64Embedder extends Embedder
 {
@@ -49,6 +51,15 @@ class Base64Embedder extends Embedder
     private function base64String($mimeType, $content)
     {
         return 'data:'.$mimeType.';base64,'.base64_encode($content);
+    }
+
+    /**
+     * @param  Swift_EmbeddedFile  $attachment
+     * @return string
+     */
+    protected function embed(Swift_EmbeddedFile $attachment)
+    {
+        return $this->message->embed($attachment);
     }
 
     /**
