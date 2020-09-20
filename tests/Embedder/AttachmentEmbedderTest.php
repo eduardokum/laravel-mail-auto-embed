@@ -10,10 +10,10 @@ use Swift_Message;
 
 class AttachmentEmbedderTest extends TestCase
 {
-    /** @var  Swift_Message */
+    /** @var Swift_Message */
     private $message;
 
-    /** @var  AttachmentEmbedder */
+    /** @var AttachmentEmbedder */
     private $embedder;
 
     /**
@@ -60,6 +60,18 @@ class AttachmentEmbedderTest extends TestCase
         $picture = new PictureEntity();
 
         $result = $this->embedder->fromEntity($picture);
+
+        $this->assertStringStartsWith('cid:', $result);
+
+        $this->assertEquals(1, $this->getEmbeddedFilesCount());
+    }
+
+    /**
+     * @test
+     */
+    public function testRemoteUrl()
+    {
+        $result = $this->embedder->fromRemoteUrl('https://via.placeholder.com/1');
 
         $this->assertStringStartsWith('cid:', $result);
 
