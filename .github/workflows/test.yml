@@ -76,8 +76,5 @@ jobs:
       - name: Install composer dependencies
         run: composer update --no-suggest --no-progress --no-interaction
 
-      - name: Run linters
-        run: composer run lint
-
       - name: Run unit tests
         run: composer run test
