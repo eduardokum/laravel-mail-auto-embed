@@ -68,8 +68,5 @@ jobs:
         if: matrix.php == '8.0'
         run: composer config platform.php 7.4.2
 
-      - name: Run linters
-        run: vendor/bin/phpcs
-
       - name: Execute tests
         run: vendor/bin/phpunit

@@ -5,7 +5,7 @@ namespace Eduardokum\LaravelMailAutoEmbed\Tests\Traits;
 use Eduardokum\LaravelMailAutoEmbed\Listeners\SwiftEmbedImages;
 
 /**
- * Shared code for creating messages and events
+ * Shared code for creating messages and events.
  */
 trait InteractsWithSwift
 {

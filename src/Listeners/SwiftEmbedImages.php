@@ -54,7 +54,7 @@ class SwiftEmbedImages implements Swift_Events_SendListener
     }
 
     /**
-     * Attaches images by parsing the HTML document
+     * Attaches images by parsing the HTML document.
      */
     private function attachImages()
     {
@@ -64,7 +64,7 @@ class SwiftEmbedImages implements Swift_Events_SendListener
         // Parse document
         $parser = new HTML5();
         $document = $parser->loadHTML($body);
-        if (!$document) {
+        if (! $document) {
             // Cannot read
             return;
         }
@@ -115,7 +115,7 @@ class SwiftEmbedImages implements Swift_Events_SendListener
         }
 
         // Don't embed if auto-embed is disabled and 'data-auto-embed' is absent
-        if (!$this->config['enabled'] && !$imageTag->hasAttribute('data-auto-embed')) {
+        if (! $this->config['enabled'] && ! $imageTag->hasAttribute('data-auto-embed')) {
             return false;
         }
 
@@ -160,7 +160,7 @@ class SwiftEmbedImages implements Swift_Events_SendListener
             $className = urldecode($embedParams[1]);
             $id = $embedParams[2];
 
-            if (!class_exists($className)) {
+            if (! class_exists($className)) {
                 return $src;
             }
 

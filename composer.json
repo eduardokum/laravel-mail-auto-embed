@@ -43,9 +43,5 @@
                 "Eduardokum\\LaravelMailAutoEmbed\\ServiceProvider"
             ]
         }
-    },
-    "scripts": {
-        "test": "phpunit",
-        "lint": "phpcs"
     }
 }

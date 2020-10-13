@@ -25,14 +25,14 @@ class TestCase extends \Orchestra\Testbench\TestCase
     }
 
     /**
-     * Returns a library file
+     * Returns a library file.
      * @param string $name
      * @return string
      */
     protected function getLibraryFile($name)
     {
-        $path = __DIR__ . '/lib/' . $name;
-        if (!\file_exists($path) || !\is_file($path)) {
+        $path = __DIR__.'/lib/'.$name;
+        if (! \file_exists($path) || ! \is_file($path)) {
             $this->fail("Cannot find {$name} in file library");
         }
 
