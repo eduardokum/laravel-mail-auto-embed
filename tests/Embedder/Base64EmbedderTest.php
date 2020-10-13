@@ -42,4 +42,14 @@ class Base64EmbedderTest extends TestCase
 
         $this->assertStringStartsWith('data:image/png;base64,', $result);
     }
+
+    /**
+     * @test
+     */
+    public function testRemoteUrl()
+    {
+        $result = $this->embedder->fromRemoteUrl('https://via.placeholder.com/1.png');
+
+        $this->assertStringStartsWith('data:image/png;base64,', $result);
+    }
 }
