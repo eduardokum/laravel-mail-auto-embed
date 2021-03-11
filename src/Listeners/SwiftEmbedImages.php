@@ -17,17 +17,17 @@ use Swift_Message;
 class SwiftEmbedImages implements Swift_Events_SendListener
 {
     /**
-     * @var  array
+     * @var array
      */
     private $config;
 
     /**
-     * @var  Swift_Message
+     * @var Swift_Message
      */
     private $message;
 
     /**
-     * @param  array  $config
+     * @param array $config
      */
     public function __construct($config)
     {
@@ -35,7 +35,7 @@ class SwiftEmbedImages implements Swift_Events_SendListener
     }
 
     /**
-     * @param  Swift_Events_SendEvent  $evt
+     * @param Swift_Events_SendEvent $evt
      */
     public function beforeSendPerformed(Swift_Events_SendEvent $evt)
     {
@@ -45,7 +45,7 @@ class SwiftEmbedImages implements Swift_Events_SendListener
     }
 
     /**
-     * @param  Swift_Events_SendEvent  $evt
+     * @param  Swift_Events_SendEvent $evt
      * @return bool
      */
     public function sendPerformed(Swift_Events_SendEvent $evt)
@@ -77,7 +77,7 @@ class SwiftEmbedImages implements Swift_Events_SendListener
     }
 
     /**
-     * @param DOMDocument $document
+     * @param  DOMDocument $document
      * @return string
      */
     private function attachImagesToDom(&$document)
@@ -91,10 +91,12 @@ class SwiftEmbedImages implements Swift_Events_SendListener
                 $embedder = $this->getEmbedder($image);
 
                 // Update src
-                $image->setAttribute('src', $this->embed(
-                    $embedder,
-                    $image->getAttribute('src')
-                ));
+                $image->setAttribute(
+                    'src', $this->embed(
+                        $embedder,
+                        $image->getAttribute('src')
+                    )
+                );
             }
 
             // Remove data properties
@@ -104,7 +106,7 @@ class SwiftEmbedImages implements Swift_Events_SendListener
     }
 
     /**
-     * @param DOMElement $imageTag
+     * @param  DOMElement $imageTag
      * @return bool
      */
     private function needsEmbed($imageTag)
@@ -123,7 +125,7 @@ class SwiftEmbedImages implements Swift_Events_SendListener
     }
 
     /**
-     * @param  DOMElement  $imageTag
+     * @param  DOMElement $imageTag
      * @return Embedder
      */
     private function getEmbedder($imageTag)
@@ -134,18 +136,18 @@ class SwiftEmbedImages implements Swift_Events_SendListener
         }
 
         switch ($method) {
-            case 'attachment':
-            default:
-                return new AttachmentEmbedder($this->message);
+        case 'attachment':
+        default:
+            return new AttachmentEmbedder($this->message);
 
-            case 'base64':
-                return new Base64Embedder();
+        case 'base64':
+            return new Base64Embedder();
         }
     }
 
     /**
-     * @param  Embedder  $embedder
-     * @param  string    $src
+     * @param  Embedder $embedder
+     * @param  string   $src
      * @return string
      */
     private function embed(Embedder $embedder, $src)
@@ -169,7 +171,11 @@ class SwiftEmbedImages implements Swift_Events_SendListener
                 return $src;
             }
 
-            /** @var EmbeddableEntity $className */
+            /**
+* 
+             *
+ * @var EmbeddableEntity $className 
+*/
             if (! $instance = $className::findEmbeddable($id)) {
                 return $src;
             }

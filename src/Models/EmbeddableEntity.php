@@ -5,7 +5,7 @@ namespace Eduardokum\LaravelMailAutoEmbed\Models;
 interface EmbeddableEntity
 {
     /**
-     * @param  mixed  $id
+     * @param  mixed $id
      * @return EmbeddableEntity|null
      */
     public static function findEmbeddable($id);

@@ -10,7 +10,7 @@ use Swift_Image;
 class Base64Embedder extends Embedder
 {
     /**
-     * @param  string  $url
+     * @param  string $url
      * @return string
      */
     public function fromUrl($url)
@@ -37,7 +37,7 @@ class Base64Embedder extends Embedder
     }
 
     /**
-     * @param  EmbeddableEntity  $entity
+     * @param  EmbeddableEntity $entity
      * @return string
      */
     public function fromEntity(EmbeddableEntity $entity)
@@ -46,8 +46,8 @@ class Base64Embedder extends Embedder
     }
 
     /**
-     * @param  string  $mimeType
-     * @param  mixed  $content
+     * @param string $mimeType
+     * @param mixed  $content
      */
     private function base64String($mimeType, $content)
     {
@@ -55,7 +55,7 @@ class Base64Embedder extends Embedder
     }
 
     /**
-     * @param  string  $url
+     * @param string $url
      */
     public function fromRemoteUrl($url)
     {

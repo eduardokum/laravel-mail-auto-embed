@@ -11,13 +11,14 @@ use Swift_Message;
 class AttachmentEmbedder extends Embedder
 {
     /**
-     * @var  Swift_Message
+     * @var Swift_Message
      */
     protected $message;
 
     /**
      * AttachmentEmbedder constructor.
-     * @param  Swift_Message $message
+     *
+     * @param Swift_Message $message
      */
     public function __construct(Swift_Message $message)
     {
@@ -25,7 +26,7 @@ class AttachmentEmbedder extends Embedder
     }
 
     /**
-     * @param  string  $url
+     * @param string $url
      */
     public function fromUrl($url)
     {
@@ -53,7 +54,7 @@ class AttachmentEmbedder extends Embedder
     }
 
     /**
-     * @param  EmbeddableEntity  $entity
+     * @param EmbeddableEntity $entity
      */
     public function fromEntity(EmbeddableEntity $entity)
     {
@@ -67,7 +68,7 @@ class AttachmentEmbedder extends Embedder
     }
 
     /**
-     * @param  Swift_EmbeddedFile  $attachment
+     * @param  Swift_EmbeddedFile $attachment
      * @return string
      */
     protected function embed(Swift_EmbeddedFile $attachment)
@@ -76,7 +77,7 @@ class AttachmentEmbedder extends Embedder
     }
 
     /**
-     * @param  string  $url
+     * @param string $url
      */
     public function fromRemoteUrl($url)
     {
