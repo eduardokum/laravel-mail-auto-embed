@@ -1,11 +1,11 @@
 {
-    "name": "eduardokum/laravel-mail-auto-embed",
+    "name": "apps-inteligentes/laravel-mail-auto-embed",
     "description": "Library for embed images in emails automatically",
     "keywords": [
         "eduardokum",
         "laravel-mail-auto-embed"
     ],
-    "homepage": "https://github.com/eduardokum/laravel-mail-auto-embed",
+    "homepage": "https://github.com/apps-inteligentes/laravel-mail-auto-embed",
     "license": "MIT",
     "authors": [
         {
