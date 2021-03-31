@@ -144,4 +144,17 @@ class MailTest extends TestCase
             $embedPlugin->sendPerformed($this->createSwiftEvent($message))
         );
     }
+
+    /**
+     * @test
+     */
+    public function testDoesntTransformRawMessages()
+    {
+        $message = $this->handleBeforeSendPerformedEvent('raw-message.txt', [
+            'enabled' => true,
+            'method' => 'attachment',
+        ]);
+
+        $this->assertEquals($this->getLibraryFile('raw-message.txt'), $message->getBody());
+    }
 }

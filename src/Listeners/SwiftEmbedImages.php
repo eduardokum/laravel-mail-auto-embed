@@ -69,11 +69,33 @@ class SwiftEmbedImages implements Swift_Events_SendListener
             return;
         }
 
+        // Invalid HTML (raw message)
+        if ($this->shouldSkipDocument($document)) {
+            return;
+        }
+
         // Add images
         $this->attachImagesToDom($document);
 
         // Replace body
         $this->message->setBody($parser->saveHTML($document));
+    }
+
+    /**
+     * @param  DOMDocument $document
+     * @return bool
+     */
+    private function shouldSkipDocument($document)
+    {
+        if ($document->childNodes->count() != 1) {
+            return false;
+        }
+
+        if ($document->childNodes->item(0)->nodeType == XML_DOCUMENT_TYPE_NODE) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
