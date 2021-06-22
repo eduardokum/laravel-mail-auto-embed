@@ -3,7 +3,9 @@
 namespace Eduardokum\LaravelMailAutoEmbed\Tests;
 
 use Eduardokum\LaravelMailAutoEmbed\Listeners\SwiftEmbedImages;
+use Eduardokum\LaravelMailAutoEmbed\Tests\fixtures\CustomEmbedder;
 use Eduardokum\LaravelMailAutoEmbed\Tests\Traits\InteractsWithSwift;
+use Illuminate\Support\Facades\App;
 
 /**
  * Tests some scenarios, like HTML5 mails and mail with "invalid" HTML that mail clients
@@ -40,6 +42,22 @@ class FormatTest extends TestCase
         $this->assertEmailImageTags([
             'url' => 'cid:',
             'entity' => 'cid:',
+        ], $message->getBody());
+    }
+
+    /**
+     * @test
+     */
+    public function testMixedAndCustomEmbedders()
+    {
+        App::bind('mail-auto-embed.custom', CustomEmbedder::class);
+
+        $message = $this->handleBeforeSendPerformedEvent('formats/html5-custom-embeds.html', self::HANDLE_CONFIG);
+
+        $this->assertEmailImageTags([
+            'default' => 'cid:',
+            'custom embedder' => 'custom:',
+            'invalid embedder' => 'cid:',
         ], $message->getBody());
     }
 }
