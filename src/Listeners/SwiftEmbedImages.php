@@ -8,6 +8,7 @@ use Eduardokum\LaravelMailAutoEmbed\Embedder\AttachmentEmbedder;
 use Eduardokum\LaravelMailAutoEmbed\Embedder\Base64Embedder;
 use Eduardokum\LaravelMailAutoEmbed\Embedder\Embedder;
 use Eduardokum\LaravelMailAutoEmbed\Models\EmbeddableEntity;
+use Illuminate\Support\Facades\App;
 use Masterminds\HTML5;
 use ReflectionClass;
 use Swift_Events_SendEvent;
@@ -155,14 +156,12 @@ class SwiftEmbedImages implements Swift_Events_SendListener
             $method = $this->config['method'];
         }
 
-        switch ($method) {
-            case 'attachment':
-            default:
-                return new AttachmentEmbedder($this->message);
-
-            case 'base64':
-                return new Base64Embedder();
+        $embedderName = "mail-auto-embed.{$method}";
+        if (!App::bound($embedderName)) {
+            $embedderName = 'mail-auto-embed.attachment';
         }
+
+        return App::make($embedderName, [$this->message]);
     }
 
     /**
