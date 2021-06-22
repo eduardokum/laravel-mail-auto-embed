@@ -157,7 +157,7 @@ class SwiftEmbedImages implements Swift_Events_SendListener
         }
 
         $embedderName = "mail-auto-embed.{$method}";
-        if (!App::bound($embedderName)) {
+        if (! App::bound($embedderName)) {
             $embedderName = 'mail-auto-embed.attachment';
         }
 
