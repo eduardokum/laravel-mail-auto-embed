@@ -12,8 +12,14 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
+      - name: Setup PHP with php-cs-fixer
+        uses: shivammathur/setup-php@master
+        with:
+          php-version: '8.0'
+          tools: friendsofphp/php-cs-fixer:^2.19
+
       - name: Run php-cs-fixer
-        uses: docker://oskarstark/php-cs-fixer-ga
+        run: php-cs-fixer fix
 
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:

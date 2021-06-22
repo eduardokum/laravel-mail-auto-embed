@@ -2,6 +2,8 @@
 
 namespace Eduardokum\LaravelMailAutoEmbed;
 
+use Eduardokum\LaravelMailAutoEmbed\Embedder\AttachmentEmbedder;
+use Eduardokum\LaravelMailAutoEmbed\Embedder\Base64Embedder;
 use Eduardokum\LaravelMailAutoEmbed\Listeners\SwiftEmbedImages;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
@@ -28,6 +30,10 @@ class ServiceProvider extends BaseServiceProvider
     public function register()
     {
         $this->mergeConfigFrom($this->getConfigPath(), 'mail-auto-embed');
+
+        // Register default embedder
+        $this->app->bind('mail-auto-embed.attachment', AttachmentEmbedder::class);
+        $this->app->bind('mail-auto-embed.base64', Base64Embedder::class);
     }
 
     /**
