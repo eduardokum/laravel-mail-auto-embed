@@ -95,8 +95,12 @@ class AttachmentEmbedder extends Embedder
             if ($httpcode == 200) {
                 $pathInfo = pathinfo($url);
 
+                $queryStr = parse_url($url, PHP_URL_QUERY);
+                parse_str($queryStr, $queryParams);
+                $basename = $queryParams['basename'] ?? $pathInfo['basename'];
+
                 return $this->embed(
-                    new Swift_Image($raw, "{$pathInfo['basename']}", $contentType)
+                    new Swift_Image($raw, "{$basename}", $contentType)
                 );
             }
         }
