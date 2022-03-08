@@ -8,9 +8,11 @@ use Eduardokum\LaravelMailAutoEmbed\Embedder\AttachmentEmbedder;
 use Eduardokum\LaravelMailAutoEmbed\Embedder\Base64Embedder;
 use Eduardokum\LaravelMailAutoEmbed\Embedder\Embedder;
 use Eduardokum\LaravelMailAutoEmbed\Models\EmbeddableEntity;
+use Exception;
 use Illuminate\Mail\Events\MessageSending;
 use Masterminds\HTML5;
 use ReflectionClass;
+use Swift_Message;
 use Symfony\Component\Mime\Email;
 
 class SymfonyEmbedImages
@@ -21,7 +23,7 @@ class SymfonyEmbedImages
     private $config;
 
     /**
-     * @var  Email
+     * @var  Email|Swift_Message
      */
     private $message;
 
@@ -49,7 +51,7 @@ class SymfonyEmbedImages
     private function attachImages()
     {
         // Get body
-        $body = $this->message->getBody();
+        $body = $this->message->getHtmlBody();
 
         // Parse document
         $parser = new HTML5();
@@ -63,14 +65,16 @@ class SymfonyEmbedImages
         $this->attachImagesToDom($document);
 
         // Replace body
-        $this->message->setBody($parser->saveHTML($document));
+        $this->message->html($parser->saveHTML($document));
     }
 
     /**
      * @param DOMDocument $document
-     * @return string
+     *
+     * @return void
+     * @throws Exception
      */
-    private function attachImagesToDom(&$document)
+    private function attachImagesToDom(DOMDocument &$document)
     {
         foreach ($document->getElementsByTagName('img') as $image) {
             \assert($image instanceof DOMElement);
@@ -79,7 +83,6 @@ class SymfonyEmbedImages
             if ($this->needsEmbed($image)) {
                 // Get proper embedder
                 $embedder = $this->getEmbedder($image);
-
                 // Update src
                 $image->setAttribute('src', $this->embed(
                     $embedder,
@@ -95,9 +98,10 @@ class SymfonyEmbedImages
 
     /**
      * @param DOMElement $imageTag
+     *
      * @return bool
      */
-    private function needsEmbed($imageTag)
+    private function needsEmbed(DOMElement $imageTag)
     {
         // Don't embed if 'data-skip-embed' is present
         if ($imageTag->hasAttribute('data-skip-embed')) {
@@ -113,10 +117,12 @@ class SymfonyEmbedImages
     }
 
     /**
-     * @param  DOMElement  $imageTag
+     * @param DOMElement $imageTag
+     *
      * @return Embedder
+     * @throws Exception
      */
-    private function getEmbedder($imageTag)
+    private function getEmbedder(DOMElement $imageTag)
     {
         $method = $imageTag->getAttribute('data-auto-embed');
         if (empty($method)) {
@@ -126,8 +132,8 @@ class SymfonyEmbedImages
         switch ($method) {
             case 'attachment':
             default:
-                return new AttachmentEmbedder($this->message);
-
+                return (new AttachmentEmbedder())
+                    ->setSymfonyMessage($this->message);
             case 'base64':
                 return new Base64Embedder();
         }

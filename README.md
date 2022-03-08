@@ -239,7 +239,6 @@ Then, you can use the `embed:ClassName:id` syntax in your e-mail template:
 </p>
 ```
 
-
 ## Contributing
 Please feel free to submit pull requests if you can improve or add any
 features.

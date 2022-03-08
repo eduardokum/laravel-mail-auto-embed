@@ -1,0 +1,2 @@
+The is a raw message that should be skipped.
+It doesn't contain any images.
