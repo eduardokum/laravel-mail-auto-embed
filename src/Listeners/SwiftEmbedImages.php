@@ -8,7 +8,6 @@ use Eduardokum\LaravelMailAutoEmbed\Embedder\AttachmentEmbedder;
 use Eduardokum\LaravelMailAutoEmbed\Embedder\Base64Embedder;
 use Eduardokum\LaravelMailAutoEmbed\Embedder\Embedder;
 use Eduardokum\LaravelMailAutoEmbed\Models\EmbeddableEntity;
-use Illuminate\Support\Facades\App;
 use Masterminds\HTML5;
 use ReflectionClass;
 use Swift_Events_SendEvent;
@@ -55,7 +54,7 @@ class SwiftEmbedImages implements Swift_Events_SendListener
     }
 
     /**
-     * Attaches images by parsing the HTML document.
+     *
      */
     private function attachImages()
     {
@@ -80,13 +79,19 @@ class SwiftEmbedImages implements Swift_Events_SendListener
 
         // Replace body
         $this->message->setBody($parser->saveHTML($document));
+
+//        $html_body = $this->message->getBody();
+//
+        /*        $html_body = preg_replace_callback('/<img.*src="(.*?)"\s?(.*)?>/', [$this, 'replaceCallback'], $html_body);*/
+//
+//        $this->message->setBody($html_body);
     }
 
     /**
      * @param  DOMDocument $document
      * @return bool
      */
-    private function shouldSkipDocument($document)
+    private function shouldSkipDocument(DOMDocument $document)
     {
         if ($document->childNodes->count() != 1) {
             return false;
@@ -101,9 +106,8 @@ class SwiftEmbedImages implements Swift_Events_SendListener
 
     /**
      * @param DOMDocument $document
-     * @return string
      */
-    private function attachImagesToDom(&$document)
+    private function attachImagesToDom(DOMDocument &$document)
     {
         foreach ($document->getElementsByTagName('img') as $image) {
             \assert($image instanceof DOMElement);
@@ -130,7 +134,7 @@ class SwiftEmbedImages implements Swift_Events_SendListener
      * @param DOMElement $imageTag
      * @return bool
      */
-    private function needsEmbed($imageTag)
+    private function needsEmbed(DOMElement $imageTag)
     {
         // Don't embed if 'data-skip-embed' is present
         if ($imageTag->hasAttribute('data-skip-embed')) {
@@ -146,22 +150,23 @@ class SwiftEmbedImages implements Swift_Events_SendListener
     }
 
     /**
-     * @param  DOMElement  $imageTag
+     * @param DOMElement $imageTag
      * @return Embedder
      */
-    private function getEmbedder($imageTag)
+    private function getEmbedder(DOMElement $imageTag)
     {
         $method = $imageTag->getAttribute('data-auto-embed');
         if (empty($method)) {
             $method = $this->config['method'];
         }
 
-        $embedderName = "mail-auto-embed.{$method}";
-        if (! App::bound($embedderName)) {
-            $embedderName = 'mail-auto-embed.attachment';
+        switch ($method) {
+            case 'attachment':
+            default:
+                return new AttachmentEmbedder($this->message);
+            case 'base64':
+                return new Base64Embedder();
         }
-
-        return App::make($embedderName, [$this->message]);
     }
 
     /**
@@ -173,6 +178,7 @@ class SwiftEmbedImages implements Swift_Events_SendListener
     {
         // Entity embedding
         if (strpos($src, 'embed:') === 0) {
+
             $embedParams = explode(':', $src);
             if (count($embedParams) < 3) {
                 return $src;
@@ -181,12 +187,12 @@ class SwiftEmbedImages implements Swift_Events_SendListener
             $className = urldecode($embedParams[1]);
             $id = $embedParams[2];
 
-            if (! class_exists($className)) {
+            if (!class_exists($className)) {
                 return $src;
             }
 
             $class = new ReflectionClass($className);
-            if (! $class->implementsInterface(EmbeddableEntity::class)) {
+            if (! $class->implementsInterface(EmbeddableEntity::class) ) {
                 return $src;
             }
 
@@ -201,20 +207,6 @@ class SwiftEmbedImages implements Swift_Events_SendListener
         // URL embedding
         if (filter_var($src, FILTER_VALIDATE_URL) !== false) {
             return $embedder->fromUrl($src);
-        }
-
-        // Path embedding
-        $publicPath = public_path($src);
-        $appPath = app_path($src);
-        $storagePath = storage_path($src);
-        if (file_exists($src)) {
-            return $embedder->fromPath($src);
-        } elseif (file_exists($publicPath)) { // Try to guess where the file is at that priority level
-            return $embedder->fromPath($publicPath);
-        } elseif (file_exists($appPath)) {
-            return $embedder->fromPath($appPath);
-        } elseif (file_exists($storagePath)) {
-            return $embedder->fromPath($storagePath);
         }
 
         return $src;

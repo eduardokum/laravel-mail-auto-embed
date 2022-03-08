@@ -3,9 +3,6 @@
 namespace Eduardokum\LaravelMailAutoEmbed\Embedder;
 
 use Eduardokum\LaravelMailAutoEmbed\Models\EmbeddableEntity;
-use Illuminate\Support\Str;
-use Swift_EmbeddedFile;
-use Swift_Image;
 
 class Base64Embedder extends Embedder
 {
@@ -27,6 +24,11 @@ class Base64Embedder extends Embedder
         return $url;
     }
 
+    /**
+     * @param $path
+     *
+     * @return string
+     */
     public function fromPath($path)
     {
         if (file_exists($path)) {
@@ -46,15 +48,6 @@ class Base64Embedder extends Embedder
     }
 
     /**
-     * @param  string  $mimeType
-     * @param  mixed  $content
-     */
-    private function base64String($mimeType, $content)
-    {
-        return 'data:'.$mimeType.';base64,'.base64_encode($content);
-    }
-
-    /**
      * @param  string  $url
      */
     public function fromRemoteUrl($url)
@@ -63,7 +56,6 @@ class Base64Embedder extends Embedder
             $ch = curl_init($url);
             curl_setopt($ch, CURLOPT_HEADER, 0);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-            curl_setopt($ch, CURLOPT_BINARYTRANSFER, 1);
             curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
             curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
             $raw = curl_exec($ch);
@@ -75,5 +67,16 @@ class Base64Embedder extends Embedder
                 return $this->base64String($contentType, $raw);
             }
         }
+
+        return $url;
+    }
+
+    /**
+     * @param  string  $mimeType
+     * @param  mixed  $content
+     */
+    private function base64String($mimeType, $content)
+    {
+        return 'data:'.$mimeType.';base64,'.base64_encode($content);
     }
 }

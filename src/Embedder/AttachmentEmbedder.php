@@ -3,7 +3,6 @@
 namespace Eduardokum\LaravelMailAutoEmbed\Embedder;
 
 use Eduardokum\LaravelMailAutoEmbed\Models\EmbeddableEntity;
-use Illuminate\Support\Str;
 use Swift_EmbeddedFile;
 use Swift_Image;
 use Swift_Message;
@@ -41,6 +40,11 @@ class AttachmentEmbedder extends Embedder
         return $url;
     }
 
+    /**
+     * @param $path
+     *
+     * @return string
+     */
     public function fromPath($path)
     {
         if (file_exists($path)) {
@@ -67,15 +71,6 @@ class AttachmentEmbedder extends Embedder
     }
 
     /**
-     * @param  Swift_EmbeddedFile  $attachment
-     * @return string
-     */
-    protected function embed(Swift_EmbeddedFile $attachment)
-    {
-        return $this->message->embed($attachment);
-    }
-
-    /**
      * @param  string  $url
      */
     public function fromRemoteUrl($url)
@@ -84,7 +79,6 @@ class AttachmentEmbedder extends Embedder
             $ch = curl_init($url);
             curl_setopt($ch, CURLOPT_HEADER, 0);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-            curl_setopt($ch, CURLOPT_BINARYTRANSFER, 1);
             curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
             curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
             $raw = curl_exec($ch);
@@ -104,5 +98,15 @@ class AttachmentEmbedder extends Embedder
                 );
             }
         }
+        return $url;
+    }
+
+    /**
+     * @param  Swift_EmbeddedFile  $attachment
+     * @return string
+     */
+    protected function embed(Swift_EmbeddedFile $attachment)
+    {
+        return $this->message->embed($attachment);
     }
 }

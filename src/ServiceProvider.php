@@ -30,10 +30,6 @@ class ServiceProvider extends BaseServiceProvider
     public function register()
     {
         $this->mergeConfigFrom($this->getConfigPath(), 'mail-auto-embed');
-
-        // Register default embedder
-        $this->app->bind('mail-auto-embed.attachment', AttachmentEmbedder::class);
-        $this->app->bind('mail-auto-embed.base64', Base64Embedder::class);
     }
 
     /**
