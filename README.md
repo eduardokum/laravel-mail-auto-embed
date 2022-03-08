@@ -239,47 +239,6 @@ Then, you can use the `embed:ClassName:id` syntax in your e-mail template:
 </p>
 ```
 
-## Custom embedders
-There might be cases where you want to use a custom embedder, which can be
-registered via the App container.
-
-Your embedder should extend the
-`Eduardokum\LaravelMailAutoEmbed\Embedder\Embedder` class.
-
-```php
-namespace App\MailEmbedders;
-
-class CustomEmbedder extends AttachmentInterface
-{
-    // your embedder code, which attaches other stuff
-}
-```
-
-To bind the new embedder with the extension, bind it as
-`mail-auto-embed.<embedder name>` in your `AppServiceProvider`:
-
-```php
-use App\MailEmbedders\CustomEmbedder;
-
-class AppServiceProvider extends ServiceProvider
-{
-    /**
-     * Register the application services.
-     *
-     * @return void
-     */
-    public function register()
-    {
-        // …
-        $this->app->bind('mail-auto-embed.custom', CustomEmbedder::class);
-    }
-}
-```
-
-Lastly, either change your published `mail-auto-embed.method` to `custom`, or
-use `data-auto-embed="custom"` on the applicable images you want to embed using
-your embedder.
-
 ## Contributing
 Please feel free to submit pull requests if you can improve or add any
 features.
