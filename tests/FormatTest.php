@@ -44,20 +44,4 @@ class FormatTest extends TestCase
             'entity' => 'cid:',
         ], $message->getBody());
     }
-
-    /**
-     * @test
-     */
-    public function testMixedAndCustomEmbedders()
-    {
-        App::bind('mail-auto-embed.custom', CustomEmbedder::class);
-
-        $message = $this->handleBeforeSendPerformedEvent('formats/html5-custom-embeds.html', self::HANDLE_CONFIG);
-
-        $this->assertEmailImageTags([
-            'default' => 'cid:',
-            'custom embedder' => 'custom:',
-            'invalid embedder' => 'cid:',
-        ], $message->getBody());
-    }
 }
