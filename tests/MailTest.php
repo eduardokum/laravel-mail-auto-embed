@@ -3,11 +3,11 @@
 namespace Eduardokum\LaravelMailAutoEmbed\Tests;
 
 use Eduardokum\LaravelMailAutoEmbed\Listeners\SwiftEmbedImages;
-use Eduardokum\LaravelMailAutoEmbed\Tests\Traits\InteractsWithSwift;
+use Eduardokum\LaravelMailAutoEmbed\Tests\Traits\InteractsWithMessage;
 
 class MailTest extends TestCase
 {
-    use InteractsWithSwift;
+    use InteractsWithMessage;
 
     /**
      * @test
@@ -22,7 +22,7 @@ class MailTest extends TestCase
         $this->assertEmailImageTags([
             'url' => 'cid:',
             'entity' => 'cid:',
-        ], $message->getBody());
+        ], $message);
     }
 
     /**
@@ -38,7 +38,7 @@ class MailTest extends TestCase
         $this->assertEmailImageTags([
             'embed' => 'cid:',
             'skip' => 'http://localhost/test.png',
-        ], $message->getBody());
+        ], $message);
     }
 
     /**
@@ -54,7 +54,7 @@ class MailTest extends TestCase
         $this->assertEmailImageTags([
             'ignore' => 'http://localhost/test.png',
             'embed' => 'cid:',
-        ], $message->getBody());
+        ], $message);
     }
 
     /**
@@ -70,7 +70,7 @@ class MailTest extends TestCase
         $this->assertEmailImageTags([
             'attachment' => 'cid:',
             'base64' => 'data:image/png;base64,',
-        ], $message->getBody());
+        ], $message);
     }
 
     /**
@@ -86,7 +86,7 @@ class MailTest extends TestCase
         $this->assertEmailImageTags([
             'attachment' => 'cid:',
             'base64' => 'data:image/png;base64,',
-        ], $message->getBody());
+        ], $message);
     }
 
     /**
@@ -107,7 +107,7 @@ class MailTest extends TestCase
             'class' => 'embed:WrongEntityClassName:1',
             'implementation' => 'embed:Eduardokum\\LaravelMailAutoEmbed\\Tests\\fixtures\\WrongEntity:1',
             'not found' => 'embed:Eduardokum\\LaravelMailAutoEmbed\\Tests\\fixtures\\PictureEntity:9',
-        ], $message->getBody());
+        ], $message);
     }
 
     /**
@@ -128,7 +128,7 @@ class MailTest extends TestCase
             'class' => 'embed:WrongEntityClassName:1',
             'implementation' => 'embed:Eduardokum\\LaravelMailAutoEmbed\\Tests\\fixtures\\WrongEntity:1',
             'not found' => 'embed:Eduardokum\\LaravelMailAutoEmbed\\Tests\\fixtures\\PictureEntity:9',
-        ], $message->getBody());
+        ], $message);
     }
 
     /**
@@ -136,12 +136,32 @@ class MailTest extends TestCase
      */
     public function testDoesntHandleSendPerformedEvent()
     {
-        $message = $this->createSwiftMessage('<h1>Test</h1>');
+        if ($this->isLaravel9()) {
+            $this->assertTrue(true);
+        } else {
+            $message = $this->createMessage('<h1>Test</h1>');
 
-        $embedPlugin = new SwiftEmbedImages(['enabled' => true, 'method' => 'attachment']);
+            $embedPlugin = new SwiftEmbedImages(['enabled' => true, 'method' => 'attachment']);
 
-        $this->assertTrue(
-            $embedPlugin->sendPerformed($this->createSwiftEvent($message))
+            $this->assertTrue(
+                $embedPlugin->sendPerformed($this->createSwiftEvent($message))
+            );
+        }
+    }
+
+    /**
+     * @test
+     */
+    public function testDoesntTransformRawMessages()
+    {
+        $message = $this->handleBeforeSendPerformedEvent('raw-message.txt', [
+            'enabled' => true,
+            'method' => 'attachment',
+        ]);
+
+        $this->assertEquals(
+            $this->getLibraryFile('raw-message.txt'),
+            ($this->isLaravel9() ? $message->getTextBody() : $message->getBody())
         );
     }
 

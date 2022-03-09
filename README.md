@@ -10,6 +10,13 @@ replacing the original online-version of the image.
 
 Should work on Laravel 5.3+. Automatically tested for Laravel 5.4+ on PHP 7.0+.
 
+## Version Compatibility
+
+| Laravel | Package |
+|---------|---------|
+| \< 8.x  | 1.x     |
+| \> 9.x  | 2.x     |
+
 ## Install
 
 You can install the package via composer:

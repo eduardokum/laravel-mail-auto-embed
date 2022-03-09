@@ -2,10 +2,7 @@
 
 namespace Eduardokum\LaravelMailAutoEmbed\Tests;
 
-use Eduardokum\LaravelMailAutoEmbed\Listeners\SwiftEmbedImages;
-use Eduardokum\LaravelMailAutoEmbed\Tests\fixtures\CustomEmbedder;
-use Eduardokum\LaravelMailAutoEmbed\Tests\Traits\InteractsWithSwift;
-use Illuminate\Support\Facades\App;
+use Eduardokum\LaravelMailAutoEmbed\Tests\Traits\InteractsWithMessage;
 
 /**
  * Tests some scenarios, like HTML5 mails and mail with "invalid" HTML that mail clients
@@ -13,7 +10,8 @@ use Illuminate\Support\Facades\App;
  */
 class FormatTest extends TestCase
 {
-    use InteractsWithSwift;
+    use InteractsWithMessage;
+
     private const HANDLE_CONFIG = [
         'enabled' => true,
         'method' => 'attachment',
@@ -29,7 +27,7 @@ class FormatTest extends TestCase
         $this->assertEmailImageTags([
             'url' => 'cid:',
             'entity' => 'cid:',
-        ], $message->getBody());
+        ], $message);
     }
 
     /**
@@ -42,6 +40,6 @@ class FormatTest extends TestCase
         $this->assertEmailImageTags([
             'url' => 'cid:',
             'entity' => 'cid:',
-        ], $message->getBody());
+        ], $message);
     }
 }

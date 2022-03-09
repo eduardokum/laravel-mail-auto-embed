@@ -3,28 +3,45 @@
 namespace Eduardokum\LaravelMailAutoEmbed\Tests\Traits;
 
 use Eduardokum\LaravelMailAutoEmbed\Listeners\SwiftEmbedImages;
+use Eduardokum\LaravelMailAutoEmbed\Listeners\SymfonyEmbedImages;
+use Illuminate\Mail\Events\MessageSending;
+use Swift_Message;
+use Symfony\Component\Mime\Email;
 
 /**
  * Shared code for creating messages and events.
  */
-trait InteractsWithSwift
+trait InteractsWithMessage
 {
     /**
-     * @param  string  $htmlMessage
-     * @return \Swift_Message
+     * @return bool
      */
-    protected function createSwiftMessage($htmlMessage)
+    private function isLaravel9()
     {
-        $message = new \Swift_Message('test', $htmlMessage);
-
-        return $message;
+        return version_compare($this->createApplication()->version(), '9.0.0', '>=');
     }
 
     /**
-     * @param  \Swift_Message  $message
+     * @param  string  $htmlMessage
+     *
+     * @return Email|Swift_Message
+     */
+    protected function createMessage($htmlMessage)
+    {
+        if ($this->isLaravel9()) {
+            return (new Email())->to('test@test.com')->from('sender@test.com')->subject('test')
+                ->html($htmlMessage)
+                ->text($htmlMessage);
+        } else {
+            return new Swift_Message('test', $htmlMessage);
+        }
+    }
+
+    /**
+     * @param  Swift_Message  $message
      * @return \Swift_Events_SendEvent
      */
-    protected function createSwiftEvent(\Swift_Message $message)
+    protected function createSwiftEvent(Swift_Message $message)
     {
         $dispatcher = new \Swift_Events_SimpleEventDispatcher();
         $transport = new \Swift_Transport_NullTransport($dispatcher);
@@ -36,12 +53,20 @@ trait InteractsWithSwift
     /**
      * @param  string  $libraryFile
      * @param  array   $options
-     * @return \Swift_Message
+     * @return Swift_Message|Email
      */
     protected function handleBeforeSendPerformedEvent($libraryFile, $options)
     {
         $htmlMessage = $this->getLibraryFile($libraryFile);
-        $message = $this->createSwiftMessage($htmlMessage);
+        $message = $this->createMessage($htmlMessage);
+
+        if ($this->isLaravel9()) {
+            $event = new MessageSending($message);
+            (new SymfonyEmbedImages($options))
+                ->handle($event);
+            $event->message->getBody();
+            return $event->message;
+        }
 
         $embedPlugin = new SwiftEmbedImages($options);
         $embedPlugin->beforeSendPerformed($this->createSwiftEvent($message));
@@ -65,7 +90,7 @@ trait InteractsWithSwift
             // Check if the string is contained within the string
             $this->$method(
                 sprintf('<!-- %s --><img src="%s', $comment, $src),
-                $body
+                $this->isLaravel9() ? $body->getHtmlBody() : $body->getBody()
             );
         }
     }
