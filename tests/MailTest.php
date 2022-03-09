@@ -164,17 +164,4 @@ class MailTest extends TestCase
             ($this->isLaravel9() ? $message->getTextBody() : $message->getBody())
         );
     }
-
-    /**
-     * @test
-     */
-    public function testDoesntTransformRawMessages()
-    {
-        $message = $this->handleBeforeSendPerformedEvent('raw-message.txt', [
-            'enabled' => true,
-            'method' => 'attachment',
-        ]);
-
-        $this->assertEquals($this->getLibraryFile('raw-message.txt'), $message->getBody());
-    }
 }
