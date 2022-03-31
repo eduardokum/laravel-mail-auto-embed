@@ -135,7 +135,6 @@ class AttachmentEmbedder extends Embedder
     protected function embed($body, $name, $type)
     {
         if ($this->isLaravel9() && !empty($this->symfonyMessage)) {
-            $name = Str::random();
             $this->symfonyMessage->embed($body, $name, $type);
             return "cid:$name";
         }
