@@ -3,9 +3,20 @@
 namespace Eduardokum\LaravelMailAutoEmbed\Embedder;
 
 use Eduardokum\LaravelMailAutoEmbed\Models\EmbeddableEntity;
+use Illuminate\Support\Arr;
 
 class Base64Embedder extends Embedder
 {
+    /**
+     * @var  array
+     */
+    private $config;
+
+    public function __construct($config)
+    {
+        $this->config = $config;
+    }
+
     /**
      * @param  string  $url
      * @return string
@@ -55,6 +66,8 @@ class Base64Embedder extends Embedder
         if (filter_var($url, FILTER_VALIDATE_URL)) {
             $ch = curl_init($url);
             curl_setopt($ch, CURLOPT_HEADER, 0);
+            curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, Arr::get($this->config, 'curl.connect_timeout', 5));
+            curl_setopt($ch, CURLOPT_TIMEOUT, Arr::get($this->config, 'curl.timeout', 10));
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
             curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
             curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);

@@ -25,4 +25,8 @@ return [
 
     'method' => env('MAIL_AUTO_EMBED_METHOD', 'attachment'),
 
+    'curl' => [
+        'connect_timeout' => 5, // Seconds
+        'timeout' => 10, // Seconds
+    ]
 ];

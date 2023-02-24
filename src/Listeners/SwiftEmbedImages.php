@@ -169,7 +169,7 @@ class SwiftEmbedImages implements Swift_Events_SendListener
                 return (new AttachmentEmbedder())
                     ->setSwiftMessage($this->message);
             case 'base64':
-                return new Base64Embedder();
+                return new Base64Embedder($this->config);
         }
     }
 

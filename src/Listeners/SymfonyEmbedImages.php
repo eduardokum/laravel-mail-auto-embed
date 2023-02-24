@@ -135,7 +135,7 @@ class SymfonyEmbedImages
                 return (new AttachmentEmbedder())
                     ->setSymfonyMessage($this->message);
             case 'base64':
-                return new Base64Embedder();
+                return new Base64Embedder($this->config);
         }
     }
 

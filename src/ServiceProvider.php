@@ -7,6 +7,7 @@ use Eduardokum\LaravelMailAutoEmbed\Embedder\Base64Embedder;
 use Eduardokum\LaravelMailAutoEmbed\Listeners\SwiftEmbedImages;
 use Eduardokum\LaravelMailAutoEmbed\Listeners\SymfonyEmbedImages;
 use Illuminate\Mail\Events\MessageSending;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
@@ -27,7 +28,9 @@ class ServiceProvider extends BaseServiceProvider
                     ->handle($event);
             });
         } else {
-            Mail::getSwiftMailer()->registerPlugin(new SwiftEmbedImages($this->app['config']->get('mail-auto-embed')));
+            foreach (Arr::get($this->app['config'], 'mail.mailers', []) as $driver => $mailer) {
+                Mail::driver($driver)->getSwiftMailer()->registerPlugin(new SwiftEmbedImages($this->app['config']->get('mail-auto-embed')));
+            }
         }
     }
 

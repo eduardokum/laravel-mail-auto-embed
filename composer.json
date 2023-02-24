@@ -25,6 +25,7 @@
         "ext-fileinfo":              "*"
     },
     "require-dev": {
+        "orchestra/testbench": "^4.0|^5.0|^6.0|^7.0|^8.0",
         "phpunit/phpunit": "^8.5.30|^9.0|^10.0"
     },
     "autoload": {
