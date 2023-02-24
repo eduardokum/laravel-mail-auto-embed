@@ -23,8 +23,6 @@
         "masterminds/html5":         "^2.7",
         "ext-curl":                  "*",
         "ext-fileinfo":              "*",
-        "laravel/framework": "9.*",
-        "orchestra/testbench": "7.*"
     },
     "require-dev": {
         "phpunit/phpunit": "^8.5.30|^9.0|^10.0"
