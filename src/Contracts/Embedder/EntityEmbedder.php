@@ -1,6 +1,6 @@
 <?php
 
-namespace Eduardokum\LaravelMailAutoEmbed\Embedder;
+namespace Eduardokum\LaravelMailAutoEmbed\Contracts\Embedder;
 
 use Eduardokum\LaravelMailAutoEmbed\Models\EmbeddableEntity;
 

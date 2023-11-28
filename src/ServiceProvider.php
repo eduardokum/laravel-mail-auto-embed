@@ -2,6 +2,7 @@
 
 namespace Eduardokum\LaravelMailAutoEmbed;
 
+use Eduardokum\LaravelMailAutoEmbed\Contracts\Listeners\EmbedImages;
 use Eduardokum\LaravelMailAutoEmbed\Listeners\SwiftEmbedImages;
 use Eduardokum\LaravelMailAutoEmbed\Listeners\SymfonyEmbedImages;
 use Illuminate\Foundation\Application;
@@ -23,7 +24,7 @@ class ServiceProvider extends BaseServiceProvider
     {
         $this->publishes([$this->getConfigPath() => config_path('mail-auto-embed.php')], 'config');
 
-        $this->app->singleton('laravel-mail-auto-embedder', function($app) {
+        $this->app->singleton(EmbedImages::class, function($app) {
             if (version_compare(Application::VERSION, '9.0.0', '>=')) {
                 return new SymfonyEmbedImages($app['config']->get('mail-auto-embed'));
             }
@@ -32,13 +33,13 @@ class ServiceProvider extends BaseServiceProvider
 
         if (version_compare(Application::VERSION, '9.0.0', '>=')) {
             Event::listen(function (MessageSending $event) {
-                $this->app['laravel-mail-auto-embedder']->beforeSendPerformed($event);
+                $this->app->make(EmbedImages::class)->beforeSendPerformed($event);
             });
         } else {
             foreach (Arr::get($this->app['config'], 'mail.mailers', []) as $driver => $mailer) {
                 try {
                     // If transport not exists this will throw an exception
-                    Mail::driver($driver)->getSwiftMailer()->registerPlugin($this->app['laravel-mail-auto-embedder']);
+                    Mail::driver($driver)->getSwiftMailer()->registerPlugin($this->app->make(EmbedImages::class));
                 } catch (Throwable $e) {}
             }
         }

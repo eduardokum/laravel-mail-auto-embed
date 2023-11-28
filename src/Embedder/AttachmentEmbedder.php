@@ -2,13 +2,13 @@
 
 namespace Eduardokum\LaravelMailAutoEmbed\Embedder;
 
-use Eduardokum\LaravelMailAutoEmbed\Models\EmbeddableEntity;
 use Exception;
-use Illuminate\Foundation\Application;
-use Illuminate\Support\Str;
-use Swift_EmbeddedFile;
 use Swift_Message;
+use Swift_EmbeddedFile;
+use Illuminate\Support\Str;
 use Symfony\Component\Mime\Email;
+use Illuminate\Foundation\Application;
+use Eduardokum\LaravelMailAutoEmbed\Models\EmbeddableEntity;
 
 class AttachmentEmbedder extends Embedder
 {

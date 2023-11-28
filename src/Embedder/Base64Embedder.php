@@ -2,8 +2,8 @@
 
 namespace Eduardokum\LaravelMailAutoEmbed\Embedder;
 
-use Eduardokum\LaravelMailAutoEmbed\Models\EmbeddableEntity;
 use Illuminate\Support\Arr;
+use Eduardokum\LaravelMailAutoEmbed\Models\EmbeddableEntity;
 
 class Base64Embedder extends Embedder
 {
