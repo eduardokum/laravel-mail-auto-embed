@@ -22,16 +22,23 @@ class ServiceProvider extends BaseServiceProvider
     public function boot()
     {
         $this->publishes([$this->getConfigPath() => config_path('mail-auto-embed.php')], 'config');
+
+        $this->app->singleton('laravel-mail-auto-embedder', function($app) {
+            if (version_compare(Application::VERSION, '9.0.0', '>=')) {
+                return new SymfonyEmbedImages($app['config']->get('mail-auto-embed'));
+            }
+            return new SwiftEmbedImages($app['config']->get('mail-auto-embed'));
+        });
+
         if (version_compare(Application::VERSION, '9.0.0', '>=')) {
             Event::listen(function (MessageSending $event) {
-                (new SymfonyEmbedImages($this->app['config']->get('mail-auto-embed')))
-                    ->beforeSendPerformed($event);
+                $this->app['laravel-mail-auto-embedder']->beforeSendPerformed($event);
             });
         } else {
             foreach (Arr::get($this->app['config'], 'mail.mailers', []) as $driver => $mailer) {
                 try {
                     // If transport not exists this will throw an exception
-                    Mail::driver($driver)->getSwiftMailer()->registerPlugin(new SwiftEmbedImages($this->app['config']->get('mail-auto-embed')));
+                    Mail::driver($driver)->getSwiftMailer()->registerPlugin($this->app['laravel-mail-auto-embedder']);
                 } catch (Throwable $e) {}
             }
         }
