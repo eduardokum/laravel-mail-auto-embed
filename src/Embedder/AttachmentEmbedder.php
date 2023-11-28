@@ -4,6 +4,7 @@ namespace Eduardokum\LaravelMailAutoEmbed\Embedder;
 
 use Eduardokum\LaravelMailAutoEmbed\Models\EmbeddableEntity;
 use Exception;
+use Illuminate\Foundation\Application;
 use Illuminate\Support\Str;
 use Swift_EmbeddedFile;
 use Swift_Message;
@@ -160,6 +161,6 @@ class AttachmentEmbedder extends Embedder
      */
     private function isLaravel9()
     {
-        return version_compare(app()->version(), '9.0.0', '>=');
+        return version_compare(Application::VERSION, '9.0.0', '>=');
     }
 }

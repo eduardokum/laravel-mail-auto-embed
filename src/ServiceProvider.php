@@ -4,6 +4,7 @@ namespace Eduardokum\LaravelMailAutoEmbed;
 
 use Eduardokum\LaravelMailAutoEmbed\Listeners\SwiftEmbedImages;
 use Eduardokum\LaravelMailAutoEmbed\Listeners\SymfonyEmbedImages;
+use Illuminate\Foundation\Application;
 use Illuminate\Mail\Events\MessageSending;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Event;
@@ -21,7 +22,7 @@ class ServiceProvider extends BaseServiceProvider
     public function boot()
     {
         $this->publishes([$this->getConfigPath() => config_path('mail-auto-embed.php')], 'config');
-        if (version_compare(app()->version(), '9.0.0', '>=')) {
+        if (version_compare(Application::VERSION, '9.0.0', '>=')) {
             Event::listen(function (MessageSending $event) {
                 (new SymfonyEmbedImages($this->app['config']->get('mail-auto-embed')))
                     ->beforeSendPerformed($event);
