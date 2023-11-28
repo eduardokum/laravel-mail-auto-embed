@@ -187,8 +187,9 @@ class SymfonyEmbedImages
         }
 
         $appPath = method_exists(app(), 'path') ? app_path($src) : null;
-        $publicPath = app()->resolved('path.public') ? public_path($src) : null;
-        $storagePath = app()->resolved('path.storage') ? storage_path($src) : null;
+        $publicPath = app()->bound('path.public') ? public_path($src) : null;
+        $storagePath = app()->bound('path.storage') ? storage_path($src) : null;
+        $storageAppPath = app()->bound('path.storage') ? storage_path("app/$src") : null;
         if (file_exists($src)) {
             return $embedder->fromPath($src);
         } elseif ($publicPath && file_exists($publicPath)) { // Try to guess where the file is at that priority level
@@ -197,6 +198,8 @@ class SymfonyEmbedImages
             return $embedder->fromPath($appPath);
         } elseif ($storagePath && file_exists($storagePath)) {
             return $embedder->fromPath($storagePath);
+        } elseif ($storageAppPath && file_exists($storageAppPath)) {
+            return $embedder->fromPath($storageAppPath);
         }
 
         return $src;
