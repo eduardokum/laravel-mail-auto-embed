@@ -63,7 +63,7 @@ trait InteractsWithMessage
         if ($this->isLaravel9()) {
             $event = new MessageSending($message);
             (new SymfonyEmbedImages($options))
-                ->handle($event);
+                ->beforeSendPerformed($event);
             $event->message->getBody();
             return $event->message;
         }

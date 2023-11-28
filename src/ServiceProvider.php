@@ -24,7 +24,7 @@ class ServiceProvider extends BaseServiceProvider
         if (version_compare(app()->version(), '9.0.0', '>=')) {
             Event::listen(function (MessageSending $event) {
                 (new SymfonyEmbedImages($this->app['config']->get('mail-auto-embed')))
-                    ->handle($event);
+                    ->beforeSendPerformed($event);
             });
         } else {
             foreach (Arr::get($this->app['config'], 'mail.mailers', []) as $driver => $mailer) {

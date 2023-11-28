@@ -14,6 +14,8 @@ use ReflectionClass;
 use Swift_Events_SendEvent;
 use Swift_Events_SendListener;
 use Swift_Message;
+use Swift_Mime_SimpleMessage;
+use Symfony\Component\Mime\Email;
 
 class SwiftEmbedImages implements Swift_Events_SendListener
 {
@@ -23,7 +25,7 @@ class SwiftEmbedImages implements Swift_Events_SendListener
     private $config;
 
     /**
-     * @var  Swift_Message
+     * @var Email|Swift_Mime_SimpleMessage
      */
     private $message;
 
@@ -40,8 +42,16 @@ class SwiftEmbedImages implements Swift_Events_SendListener
      */
     public function beforeSendPerformed(Swift_Events_SendEvent $evt)
     {
-        $this->message = $evt->getMessage();
+        $this->handle($evt->getMessage());
+    }
 
+    /**
+     * @param Swift_Mime_SimpleMessage $message
+     * @return void
+     */
+    public function handle(Swift_Mime_SimpleMessage $message)
+    {
+        $this->message = $message;
         $this->attachImages();
     }
 

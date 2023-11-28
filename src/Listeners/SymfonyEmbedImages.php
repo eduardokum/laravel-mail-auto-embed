@@ -23,7 +23,7 @@ class SymfonyEmbedImages
     private $config;
 
     /**
-     * @var  Email|Swift_Message
+     * @var  Email
      */
     private $message;
 
@@ -38,10 +38,18 @@ class SymfonyEmbedImages
     /**
      * @param  MessageSending  $event
      */
-    public function handle(MessageSending $event)
+    public function beforeSendPerformed(MessageSending $event)
     {
-        $this->message = $event->message;
+        $this->handle($event->message);
+    }
 
+    /**
+     * @param Email $message
+     * @return void
+     */
+    public function handle(Email $message)
+    {
+        $this->message = $message;
         $this->attachImages();
     }
 
@@ -195,3 +203,4 @@ class SymfonyEmbedImages
         return $src;
     }
 }
+
