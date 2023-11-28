@@ -186,17 +186,16 @@ class SymfonyEmbedImages
             return $embedder->fromUrl($src);
         }
 
-        // Path embedding
-        $publicPath = public_path($src);
-        $appPath = app_path($src);
-        $storagePath = storage_path($src);
+        $appPath = method_exists(app(), 'path') ? app_path($src) : null;
+        $publicPath = app()->resolved('path.public') ? public_path($src) : null;
+        $storagePath = app()->resolved('path.storage') ? storage_path($src) : null;
         if (file_exists($src)) {
             return $embedder->fromPath($src);
-        } elseif (file_exists($publicPath)) { // Try to guess where the file is at that priority level
+        } elseif ($publicPath && file_exists($publicPath)) { // Try to guess where the file is at that priority level
             return $embedder->fromPath($publicPath);
-        } elseif (file_exists($appPath)) {
+        } elseif ($appPath && file_exists($appPath)) {
             return $embedder->fromPath($appPath);
-        } elseif (file_exists($storagePath)) {
+        } elseif ($storagePath && file_exists($storagePath)) {
             return $embedder->fromPath($storagePath);
         }
 
