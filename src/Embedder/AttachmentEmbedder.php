@@ -3,6 +3,7 @@
 namespace Eduardokum\LaravelMailAutoEmbed\Embedder;
 
 use Exception;
+use Illuminate\Support\Facades\Cache;
 use Swift_Message;
 use Swift_EmbeddedFile;
 use Illuminate\Support\Str;
@@ -102,6 +103,15 @@ class AttachmentEmbedder extends Embedder
     public function fromRemoteUrl($url)
     {
         if (filter_var($url, FILTER_VALIDATE_URL)) {
+            $hashName = implode('_', [
+                'laravel-mail-auto-embed',
+                hash('sha256', $url)
+            ]);
+
+            if (config('mail-auto-embed.curl.cache', false) && $file = Cache::get($hashName)) {
+                return $this->embed($file['content'], $file['name'], $file['type']);
+            }
+
             $ch = curl_init($url);
             curl_setopt($ch, CURLOPT_HEADER, 0);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
@@ -118,6 +128,14 @@ class AttachmentEmbedder extends Embedder
                 $queryStr = parse_url($url, PHP_URL_QUERY) ?: '';
                 parse_str($queryStr, $queryParams);
                 $basename = $queryParams['basename'] ?? $pathInfo['basename'];
+
+                if (config('mail-auto-embed.curl.cache', false)) {
+                    Cache::put($hashName, [
+                        'content' => $raw,
+                        'name' => $basename,
+                        'type' => $contentType
+                    ], config('mail-auto-embed.curl.cache_ttl', 3600));
+                }
 
                 return $this->embed($raw, $basename, $contentType);
             }

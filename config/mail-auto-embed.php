@@ -28,5 +28,7 @@ return [
     'curl' => [
         'connect_timeout' => 5, // Seconds
         'timeout' => 10, // Seconds
+        'cache' => false,
+        'cache_ttl' => 3600,
     ]
 ];
