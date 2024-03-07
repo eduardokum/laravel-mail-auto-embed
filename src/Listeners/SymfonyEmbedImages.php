@@ -60,6 +60,10 @@ class SymfonyEmbedImages
     {
         // Get body
         $body = $this->message->getHtmlBody();
+        if ($body === null) {
+            // Not an HTML message
+            return;
+        }
 
         // Parse document
         $parser = new HTML5();

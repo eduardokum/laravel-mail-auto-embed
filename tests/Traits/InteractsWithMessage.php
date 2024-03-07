@@ -23,17 +23,18 @@ trait InteractsWithMessage
 
     /**
      * @param  string  $htmlMessage
+     * @param  bool    $isRawMessage
      *
      * @return Email|Swift_Message
      */
-    protected function createMessage($htmlMessage)
+    protected function createMessage($htmlMessage, $isRawMessage = false)
     {
         if ($this->isLaravel9()) {
             return (new Email())->to('test@test.com')->from('sender@test.com')->subject('test')
-                ->html($htmlMessage)
-                ->text($htmlMessage);
+                ->text($htmlMessage)
+                ->html($isRawMessage ? null : $htmlMessage);
         } else {
-            return new Swift_Message('test', $htmlMessage);
+            return new Swift_Message('test', $htmlMessage, $isRawMessage ? 'text/plain' : null);
         }
     }
 
@@ -53,12 +54,13 @@ trait InteractsWithMessage
     /**
      * @param  string  $libraryFile
      * @param  array   $options
+     * @param  bool    $isRawMessage
      * @return Swift_Message|Email
      */
-    protected function handleBeforeSendPerformedEvent($libraryFile, $options)
+    protected function handleBeforeSendPerformedEvent($libraryFile, $options, $isRawMessage = false)
     {
         $htmlMessage = $this->getLibraryFile($libraryFile);
-        $message = $this->createMessage($htmlMessage);
+        $message = $this->createMessage($htmlMessage, $isRawMessage);
 
         if ($this->isLaravel9()) {
             $event = new MessageSending($message);

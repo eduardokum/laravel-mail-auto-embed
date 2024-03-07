@@ -164,4 +164,24 @@ class MailTest extends TestCase
             ($this->isLaravel9() ? $message->getTextBody() : $message->getBody())
         );
     }
+
+    /**
+     * @test
+     */
+    public function testDoesNotCreateHtmlBodyForSymfonyRawMessage()
+    {
+        if (! $this->isLaravel9()) {
+            $this->assertTrue(true);
+
+            return;
+        }
+
+        $message = $this->handleBeforeSendPerformedEvent(
+            'raw-message.txt',
+            ['enabled' => true, 'method' => 'attachment'],
+            true
+        );
+
+        $this->assertNull($message->getHtmlBody());
+    }
 }
