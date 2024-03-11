@@ -28,6 +28,9 @@
         "phpunit/phpunit": "^8.5.30|^9.0|^10.0|^11.0",
         "squizlabs/php_codesniffer": "^3.5"
     },
+    "config": {
+        "sort-packages": true
+    },
     "autoload": {
         "psr-4": {
             "Eduardokum\\LaravelMailAutoEmbed\\": "src"
@@ -44,5 +47,7 @@
                 "Eduardokum\\LaravelMailAutoEmbed\\ServiceProvider"
             ]
         }
-    }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
 }
