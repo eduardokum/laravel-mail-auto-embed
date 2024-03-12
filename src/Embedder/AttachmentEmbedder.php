@@ -126,7 +126,7 @@ class AttachmentEmbedder extends Embedder
                 $pathInfo = pathinfo($url);
 
                 $queryStr = parse_url($url, PHP_URL_QUERY) ?: '';
-                parse_str($queryStr, $queryParams);
+                parse_str($queryStr ?? '', $queryParams);
                 $basename = $queryParams['basename'] ?? $pathInfo['basename'];
 
                 if (config('mail-auto-embed.curl.cache', false)) {
