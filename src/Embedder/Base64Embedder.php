@@ -85,6 +85,15 @@ class Base64Embedder extends Embedder
     }
 
     /**
+     * @param string $base64
+     * @return string
+     */
+    public function fromBase64($base64)
+    {
+        return $base64;
+    }
+
+    /**
      * @param  string  $mimeType
      * @param  mixed  $content
      */

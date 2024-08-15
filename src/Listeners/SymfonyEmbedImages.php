@@ -190,6 +190,11 @@ class SymfonyEmbedImages
             return $embedder->fromUrl($src);
         }
 
+        // Base64 embedding
+        if (preg_match('/^data:image\/[a-z]+;base64,/', $src)) {
+            return $embedder->fromBase64($src);
+        }
+
         $appPath = method_exists(app(), 'path') ? app_path($src) : null;
         $publicPath = app()->bound('path.public') ? public_path($src) : null;
         $storagePath = app()->bound('path.storage') ? storage_path($src) : null;
