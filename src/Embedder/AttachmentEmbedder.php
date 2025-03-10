@@ -2,14 +2,14 @@
 
 namespace Eduardokum\LaravelMailAutoEmbed\Embedder;
 
-use Exception;
-use Illuminate\Support\Facades\Cache;
-use Swift_Message;
-use Swift_EmbeddedFile;
-use Illuminate\Support\Str;
-use Symfony\Component\Mime\Email;
-use Illuminate\Foundation\Application;
 use Eduardokum\LaravelMailAutoEmbed\Models\EmbeddableEntity;
+use Exception;
+use Illuminate\Foundation\Application;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Str;
+use Swift_EmbeddedFile;
+use Swift_Message;
+use Symfony\Component\Mime\Email;
 
 class AttachmentEmbedder extends Embedder
 {
@@ -82,6 +82,22 @@ class AttachmentEmbedder extends Embedder
     public function fromPath($path)
     {
         return $this->embed(file_get_contents($path), basename($path), mime_content_type($path));
+    }
+
+    /**
+     * @param string $base64
+     *
+     * @return string
+     * @throws Exception
+     */
+    public function fromBase64($base64)
+    {
+        $data = explode(',', $base64);
+        $type = explode(';', explode(':', $data[0])[1])[0];
+        $content = base64_decode($data[1]);
+        $name = Str::random();
+
+        return $this->embed($content, $name, $type);
     }
 
     /**

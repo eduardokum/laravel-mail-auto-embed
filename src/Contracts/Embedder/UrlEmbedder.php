@@ -15,4 +15,10 @@ interface UrlEmbedder
      * @return string
      */
     public function fromPath($path);
+
+/**
+     * @param string $base64
+     * @return string
+     */
+    public function fromBase64($base64);
 }
